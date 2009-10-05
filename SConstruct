@@ -14,5 +14,5 @@ env.Append(LIBS = ['SDL_image', 'SDL_ttf', 'SDL_gfx', 'SDL_mixer'])
 
 
 env.SharedLibrary(target = 'evolcore', source = [SOURCES], SHLIBPREFIX='')
-env.Install('/usr/local/lib/lua/5.1', ['evolcore.so','evol.lua','evol_keys.lua', 'LuaGL.so', 'LuaGlu.so', 'LuaGlut.so'])
+env.Install('/usr/local/lib/lua/5.1', ['evolcore.so','evol.lua','evol_keys.lua'])
 env.Alias('install','/usr/local/lib/lua/5.1')
