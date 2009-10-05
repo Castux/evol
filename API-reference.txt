@@ -1,0 +1,251 @@
+Quick reference
+===============
+
+
+**General**
+evol.init(w,h,[full,[gl]])
+dt,fps,t = evol.timer([fpsmax])
+evol.showCursor(show)
+evol.free(stuff) or stuff:free()
+evol.quit()
+
+**Video**
+evol.flip()
+
+**Images** 
+Image object
+image = evol.loadImage(path)
+image = evol.makeImage(w,h)
+evol.fill(color,[rect,[img]]) or image:fill(color,[rect])
+evol.blit(image,[x,y,[dest]]) or image:blit([x,y,[dest]])
+evol.putpix(x,y,color,[image]) or image:putpix(x,y,color)
+
+**Input**
+evol.input(callbacks)
+x,y,[down] = evol.mouse([button])
+down = evol.isButtonDown(button)
+down = evol.isKeyDown(key)
+
+**Fonts**
+Font object
+font = evol.loadFont(path,size)
+evol.write(font,text,x,y,[color,[image]]) or font:write(text,x,y,[color,[image]])
+
+*Graphic primitives*
+evol.line(x,y,u,v,[color,[aa,[image]]])
+evol.box(x,y,u,v,color,[fill,[image]])
+evol.circle(x,y,r,color,[aa,[fill,[image]]])
+evol.tri(x,y,u,v,m,n,color,[aa,[fill,[image]]])
+
+*Sound*
+sound = evol.loadSound(path)
+music = evol.loadMusic(path)
+evol.play(stuff,n)
+old = evol.musicVolume(new)
+
+
+Detailed reference
+==================
+
+**General**
+
+evol.init(w,h,[full,[gl]])
+	Initializes evöL
+
+	w,h: width and height in pixels of the desired window
+	full: if true, gets fullscreen mode
+	gl: if true, enables OpenGL
+
+dt,fps,t = evol.timer([fpsmax])
+	Timer utility function
+
+	Must be called each frame.
+	dt: time since last frame
+	fps: average number of frame per seconds (updated every second)
+	t: ticks (miliseconds since the program started)
+	fpsmax: if provided, limits the fps to this number
+
+evol.showCursor(show)
+	Change cursor visibility
+
+	show: if true, makes cursor visible, if false, makes it invisible
+
+evol.free(stuff) or stuff:free()
+	Frees the memory associated to a previously loaded/created image, font, sound or music
+
+	stuff: an image, font, sound or music to be freed
+
+evol.quit()
+	Shuts down evöL
+
+
+**Video**
+
+evol.flip()
+	Updates screen
+
+
+**Images** 
+
+Image object
+	A container for a drawable surface
+
+	Fields:
+		cx,cy: center of the image, relatively to top-left corner. Used by draw() to place the image.
+	Shortcut methods:
+		image:draw([x,y,[dest]])
+		image:fill(color,[rect])
+		image:putpix(x,y,color)
+		image:free()
+
+image = evol.loadImage(path)
+	Creates an image from a file (any format supported by SDL_image)
+
+	path: string containing the path to the image to load (relative to current folder, or absolute)
+	image: the created image
+
+image = evol.makeImage(w,h)
+	Creates an empty image
+
+	w,h: width and height of the image to create
+	image: the created image
+
+evol.fill(color,[rect,[img]]) or image:fill(color,[rect])
+	Fills a rectangle of an image with given color
+
+	color = {r,g,b,a} or {r,g,b}: color to fill with
+	rect = {x,y,w,h}: the rectangle to fill. Defaults to full surface.
+	img: image to fill. Defaults to screen.
+
+evol.blit(image,[x,y,[dest]]) or image:blit([x,y,[dest]])
+	Blits an image onto another
+
+	x,y: position in pixels where to put the center of the image to. Defaults to image center, so that it is put in the top left corner.
+	dest: destination image. Defaults to screen.
+
+evol.putpix(x,y,color,[image]) or image:putpix(x,y,color)
+	Changes the color of a pixel on an image
+
+	x,y: coordinates of the pixel to change
+	color = {r,g,b,[a]}: color to set the pixel to
+	image: the image to modify. Defaults to screen.
+
+**Input**
+
+evol.input(callbacks)
+	Polls events and call the associated callback functions
+
+	callbacks = {kdown, kup, mdown, mup}: table of callback functions. Each of those can be nil if not needed.
+	Event details are passed to the functions as follows:
+	kdown(key): key down event (key: the key pressed)
+	kup(key): key up event (key: the key released)
+	mdown(x,y,b): mouse button down event (x,y: mouse coordinates, b: mouse button number)
+	mup(x,y,b): mouse button up event (x,y: mouse coordinates, b: mouse button number)
+
+x,y,[down] = evol.mouse([button])
+	Queries for mouse position and optionally the status of a button
+
+	button: the button to check status of
+	x,y: position of mouse
+	down: boolean stating if given button is down
+
+down = evol.isButtonDown(button)
+	States if given mouse button is down
+
+	button: the button to check status of
+	down: boolean stating if given button is down
+
+down = evol.isKeyDown(key)
+	States if given key is down
+
+	key: the key to check status of
+	down: boolean stating if given key is down
+
+**Fonts**
+
+Font object
+	A container for fonts
+
+	Fields:
+		font.width: glyph width if the font is monospace, or else 0
+	Shortcut methods:
+		font:write(text,x,y,[color,[image]])
+		font:free()
+
+font = evol.loadFont(path,size)
+	Loads a font
+
+	path: string containing the path to the font to load (relative to current folder, or absolute)
+	size: number of pixels high the fo--- Loads a font
+	font = evol.loadFont(path,size)
+	path: string containing the path to the font to load (relative to current folder, or absolute)nt should render in later
+
+evol.write(font,text,x,y,[color,[image]]) or font:write(text,x,y,[color,[image]])
+	Renders text to an image
+
+	font: the font to use for render
+	text: UTF-8 string to render
+	x,y: position in pixels where the top-left corner of render text should appear
+	color = {r,g,b}: color to render the text in. Defaults to black.
+	image: destination image. Defaults to screen. 
+
+*Graphic primitives*
+
+evol.line(x,y,u,v,[color,[aa,[image]]])
+	Draws a line
+
+	(x,y),(u,v): coordinates in pixel of the start and end of the line
+	color = {r,g,b,[a]}: color of the line. Defaults to black.
+	aa: set to true to draw an anti-aliased line
+	image: the image to draw to. Defaults to screen.
+
+evol.box(x,y,u,v,color,[fill,[image]])
+	Draws a rectangle
+
+	(x,y),(u,v): coordinates in pixel of one corner and the opposite corner of the rectangle
+	color = {r,g,b,[a]}: color of the line. If nil, no line.
+	fill: = {r,g,b,[a]}: color of the filling. If nil, no filling.
+	image: the image to draw to. Defaults to screen.
+
+evol.circle(x,y,r,color,[aa,[fill,[image]]])
+	Draws a circle
+
+	(x,y),r: coordinates in pixel of center of circle, and radius
+	color = {r,g,b,[a]}: color of the line. If nil, no line.
+	aa: if true, circle is antialiased
+	fill: = {r,g,b,[a]}: color of the filling. If nil, no filling.
+	image: the image to draw to. Defaults to screen.
+
+evol.tri(x,y,u,v,m,n,color,[aa,[fill,[image]]])
+	Draws a triangle
+
+	(x,y),(u,v),(m,n): coordinates in pixel of the three vertices of the triangle
+	color = {r,g,b,[a]}: color of the line. If nil, no line.
+	aa: if true, triangle is antialiased
+	fill: = {r,g,b,[a]}: color of the filling. If nil, no filling.
+	image: the image to draw to. Defaults to screen.
+
+*Sound*
+
+sound = evol.loadSound(path)
+	Loads a sound
+
+	path: string containing the path to the sound to load (relative to current folder, or absolute)
+
+music = evol.loadMusic(path)
+	Loads a music
+
+	path: string containing the path to the music to load (relative to current folder, or absolute)
+
+evol.play(stuff,n)
+	Plays a sound or a music
+
+	stuff: a sound or music
+	n: the number of times to play. Defaults to 1 for sounds, and infinite (-1) for music
+
+old = evol.musicVolume(new)
+	Sets the music volume
+
+	new: if from 0 to 128, sets the volume this value. Else, does nothing.
+	old: volume before changing, or current volume if new isn't between 0 and 128.
+

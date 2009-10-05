@@ -1,0 +1,74 @@
+evöL, a small 2D game engine in Lua
+v1.0
+
+What is evöL?
+-------------
+
+evöL originated as a remake of Löve (http://love2d.org), a great 2D game engine written in Lua, and based on SDL.
+
+Löve is amazing, but unfortunately, relies heavily on hardware acceleration, which makes it almost unusable on older machines, or machine without good graphic hardware (specifically, my Eee PC).
+
+The goal of evöL is to provide an API similar to Löve but with internals based only on SDL surfaces. Less features are available, of course (no rotozooming or GL particule effects), but it retain the philosophy of very fast game prototyping in Lua.
+
+evöL is not simply a one to one wrapper for basic SDL functions but rather a compilation of the basic things I found repeated in every SDL program I made. The motivation is to have everything done in few lines of code, to focus on the game logic rather than boring SDL settings.
+
+evöL should work on all platforms supported by SDL and Lua, including GNU/Linux, Windows, Mac OS X, etc. It has been tested on Ubuntu GNU/Linux only, but you are encouraged to report any other successful build.
+
+evöL is released under the GNU General Public License Version 3. See file COPYING for details.
+
+Features
+--------
+
+- keyboard input
+- mouse input
+- image loading
+- image editing
+- image blitting
+- font rendering
+- variable or fixed FPS
+
+  Since v0.5:
+
+- graphic primitives
+- sound support
+
+  Since v1.0
+
+- OpenGL support
+
+How to build?
+-------------
+
+evöL comes as two Lua modules, one written in C, the other in Lua itself. You need to build only the one in C, of course. A SConstruct file is provided, to use with the SCons build system, but you can use any other system or IDE, for instance make.
+
+To build using SCons, simply run "scons" in the source directory. It will build the evolcore.so module.
+
+Prerequisites are the developpement libraries for:
+
+Lua
+SDL
+SDL_image
+SDL_ttf
+SDL_gfx
+
+(You might have to modify the SConstruct to reflect your installation of SDL and Lua.)
+
+How to use?
+-----------
+
+Run "sudo scons install" to install. Again you might need to modify the SConstruct to reflect your installation of Lua. You can also manually copy evolcore.so, evol.lua and evol_keys.lua to the directory of your source file, or in the Lua directory of your system.
+
+In your Lua source code file, simply add 'require "evol"' to load the evöL modules. You should normally never have to use evolcore.so directly, but it is used by evol.lua, so its presence is required.
+
+Then run 'lua yourscript.lua' from its directory.
+
+Documentation
+-------------
+
+You can find an API reference in the file API-reference.txt (automatically generated using the makedoc.lua script), and the skeleton of a basic program you can use to start in example.lua. You can see the names of the keys in evol_keys.lua, they are basically the SDL constants names in lower case, prefixed with "key" instead of "SDLK".
+
+Feedback
+--------
+
+The project is hosted on Gna: https://gna.org/projects/evol/. There you can submit bugs or get the latest version of evöL through SVN, as well as news and releases.
+You can also contact the author (Noé Falzon) at firstname.lastname(a)aliceadsl.fr
