@@ -34,6 +34,23 @@ SDL_Surface *gScreen;
 void putpixel(SDL_Surface * surface, Uint16 x, Uint16 y, Uint32 color);
 int sound_on = 1;
 int gl_on = 0;
+int curses_on = 0;
+
+typedef struct{
+	
+	TTF_Font *font;
+	int cw,ch;	/* Glyph size */
+	int w,h;	/* Terminal size */
+	
+	int N;		/* w*h */
+	
+	char *c;	/* Character data */
+	SDL_Color *fg,*bg;	/* Text and background colors */
+	
+	
+} CursesContext;
+
+CursesContext CC;
 
 /* init(width,height) */
 
@@ -105,6 +122,14 @@ static int l_init (lua_State *L)
 static int l_quit (lua_State *L)
 {
 	printf("evöL quit\n");
+	
+	if(curses_on)
+	{
+		TTF_CloseFont(CC.font);
+		free(CC.c);
+		free(CC.fg);
+		free(CC.bg);
+	}
 	
 	Mix_CloseAudio();
 	TTF_Quit(); 
@@ -690,6 +715,249 @@ static int l_freeMusic (lua_State *L)
 	return 0;
 }
 
+/* Curses mode */
+
+
+static int l_curses_init (lua_State *L)
+{
+	int size;
+	const char *font;
+	
+	CC.w = lua_tonumber(L, 1);
+	CC.h = lua_tonumber(L, 2);
+	font = lua_tostring(L, 3);
+	size = lua_tonumber(L,4);
+	
+	printf("evöL init (%dx%d), curses mode\n", CC.w, CC.h);
+	
+	/* Init SDL */
+		
+	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0 )
+	{
+		printf("Couldn't initialize SDL: %s\n", SDL_GetError());
+		exit(1);
+        }
+	
+	/* SDL_ttf */
+	
+	if (TTF_Init() < 0)
+	{
+		printf("Couldn't initialize SDL_ttf: %s\n", TTF_GetError());
+		exit(1);
+        }
+	
+	/* SDL_mixer */
+	
+	if(Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 4096 ) < 0)
+	{	
+		printf("Couldn't initialize SDL_mixer: %s\n", Mix_GetError());
+		sound_on = 0;
+		/* exit(1); */
+	}
+	
+	/* Load font */
+	CC.font = TTF_OpenFont(font,size);
+	if(!CC.font)
+	{
+		printf("Couldn't load font: %s\n", TTF_GetError());
+		exit(1);
+	}
+
+	TTF_GlyphMetrics(CC.font,'@',NULL,NULL,NULL,NULL,&CC.cw);
+	CC.ch = TTF_FontLineSkip(CC.font);
+
+	/* Set video mode */
+	gScreen=SDL_SetVideoMode(CC.w*CC.cw,CC.h*CC.ch,32, SDL_HWSURFACE|SDL_DOUBLEBUF);
+        
+        if(gScreen == NULL)
+	{
+		printf("Couldn't set %dx%d video mode: %s\n", CC.w*CC.cw, CC.h*CC.ch, SDL_GetError());
+		exit(1);
+	}
+	
+	/* Init curses context */
+	CC.N = CC.w * CC.h;
+	
+	CC.c = malloc(CC.N * sizeof(char));
+	CC.fg = malloc(CC.N * sizeof(SDL_Color));
+	CC.bg = malloc(CC.N * sizeof(SDL_Color));
+	if(CC.c == NULL || CC.c == NULL || CC.c == NULL)
+	{
+		printf("Couldn't allocate memory for curses data.\n");
+		exit(1);
+	}
+	
+	memset(CC.c, ' ', CC.N);
+	memset(CC.fg, 0, CC.N * sizeof(SDL_Color));
+	memset(CC.bg, 255, CC.N * sizeof(SDL_Color));
+	
+	curses_on = 1;
+	
+	/* Return some font information */
+	lua_pushnumber(L, CC.cw);
+	lua_pushnumber(L, CC.ch);
+
+	return 2;
+}
+
+static int l_curses_refresh (lua_State *L)
+{
+	int i,j;
+	SDL_Rect r;
+	SDL_Surface *glyph;
+	SDL_Color col;
+	char ch[2] = {0,0};
+	
+	for (i = 0; i < CC.w; i++)
+	{
+		for (j = 0; j < CC.h; j++)
+		{
+			r.x = i*CC.cw;
+			r.y = j*CC.ch;
+			r.w = CC.cw;
+			r.h = CC.ch;
+			
+			ch[0] = CC.c[i + j*CC.w];
+						
+			glyph = TTF_RenderText_Blended(CC.font, ch, CC.fg[i + j*CC.w]);
+			
+			/* Background */
+			col = CC.bg[i + j*CC.w];
+			SDL_FillRect(gScreen, &r, SDL_MapRGB(gScreen->format, col.r, col.g, col.b));
+			
+			/* Glyph */
+			r.x = i*CC.cw;
+			r.y = j*CC.ch;
+			r.w = CC.cw;
+			r.h = CC.ch;
+			SDL_BlitSurface(glyph,NULL,gScreen,&r);
+			
+			SDL_FreeSurface(glyph);
+		}	
+	}
+	
+	return 0;
+}
+
+static int l_curses_addch (lua_State *L)
+{
+	int x,y;
+	const char *ch;
+	char ch2;
+	
+	ch = lua_tostring(L, 1);
+	x = lua_tonumber(L, 2);
+	y = lua_tonumber(L, 3);
+	
+	
+	/* Clipping */
+	if(x < 0 || x >= CC.w || y < 0 || y >= CC.h)
+		return 0;
+	
+	/* Prevent non printables */
+	if(ch[0] <= 32 || (ch[0] >= 0x7f && ch[0] <= 0x9f))
+		ch2 = ' ';
+	else
+		ch2 = ch[0];
+	
+	CC.c[x + y*CC.w] = ch2;
+	
+	return 0;
+}
+
+static int l_curses_setcol (lua_State *L)
+{
+	int x,y, r,g,b, br,bg,bb;
+	int ind;
+	
+	x = lua_tonumber(L, 1);
+	y = lua_tonumber(L, 2);
+	r = luaL_optnumber(L, 3, -1);
+	g = luaL_optnumber(L, 4, -1);
+	b = luaL_optnumber(L, 5, -1);
+	br = luaL_optnumber(L, 6, -1);
+	bg = luaL_optnumber(L, 7, -1);
+	bb = luaL_optnumber(L, 8, -1);
+	
+	/* Clipping */
+	if(x < 0 || x >= CC.w || y < 0 || y >= CC.h)
+		return 0;
+	
+	ind = x + CC.w*y;
+	
+	if (r >= 0) CC.fg[ind].r = r;
+	if (g >= 0) CC.fg[ind].g = g;
+	if (b >= 0) CC.fg[ind].b = b;
+	
+	if (br >= 0) CC.bg[ind].r = br;
+	if (bg >= 0) CC.bg[ind].g = bg;
+	if (bb >= 0) CC.bg[ind].b = bb;
+	
+	return 0;
+}
+
+static int l_curses_fill (lua_State *L)
+{
+	int x,y, w,h, r,g,b, br,bg,bb;
+	const char *ch;
+	char ch2;
+	int ind,i,j;
+	
+	x = lua_tonumber(L, 1);
+	y = lua_tonumber(L, 2);
+	w = lua_tonumber(L, 3);
+	h = lua_tonumber(L, 4);
+	ch = lua_tostring(L, 5);
+	r = luaL_optnumber(L, 6, -1);
+	g = luaL_optnumber(L, 7, -1);
+	b = luaL_optnumber(L, 8, -1);
+	br = luaL_optnumber(L, 9, -1);
+	bg = luaL_optnumber(L, 10, -1);
+	bb = luaL_optnumber(L, 11, -1);
+	
+	for (i = x; i < x+w ; i++)
+	{
+		for (j = y; j < y+h ; j++)
+		{
+			/* Clipping */
+			if(i < 0 || i >= CC.w || j < 0 || j >= CC.h)
+				continue;
+
+			ind = i + CC.w*j;
+			
+			
+			if(ch)
+			{
+				/* Prevent non printables */
+				if(ch[0] <= 32 || (ch[0] >= 0x7f && ch[0] <= 0x9f))
+					ch2 = ' ';
+				else
+					ch2 = ch[0];
+				
+				CC.c[ind] = ch2;
+			}
+			
+			if (r >= 0 && g >= 0 && b >= 0)
+			{
+				CC.fg[ind].r = r;
+				CC.fg[ind].g = g;
+				CC.fg[ind].b = b;
+			}
+			
+			if (br >= 0 && bg >= 0 && bb >= 0)
+			{
+				CC.bg[ind].r = br;
+				CC.bg[ind].g = bg;
+				CC.bg[ind].b = bb;
+			}
+		}
+		
+	}
+	
+	return 0;
+}
+
+
 /* Making this a Lua module */
 
 static const struct luaL_reg R[] = {
@@ -720,6 +988,13 @@ static const struct luaL_reg R[] = {
 	{"musicVolume", l_musicVolume},
 	{"freeSound", l_freeSound},
 	{"freeMusic", l_freeMusic},
+	
+	{"curses_init", l_curses_init},
+	{"curses_refresh", l_curses_refresh},
+	{"curses_addch", l_curses_addch},
+	{"curses_setcol", l_curses_setcol},
+	{"curses_fill", l_curses_fill},
+	
 	{NULL, NULL}
 };
 

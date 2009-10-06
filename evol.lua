@@ -271,7 +271,7 @@ write = function(font, text, x, y, color, surf)
 	evolcore.printFont(font.font, text, color[1], color[2], color[3], x, y, surf.surf)
 end
 
---- *Graphic primitives*
+--- **Graphic primitives**
 
 --- Draws a line
 -- evol.line(x,y,u,v,[color,[aa,[image]]])
@@ -363,7 +363,7 @@ tri = function(x, y, u, v, m, n, color, aa, fill, surf)
 	end	
 end
 
---- *Sound*
+--- **Sound**
 
 -- INTERNAL! -- Prepares a Sound table
 local Sound = function()
@@ -429,3 +429,78 @@ end
 -- new: if from 0 to 128, sets the volume this value. Else, does nothing.
 -- old: volume before changing, or current volume if new isn't between 0 and 128.
 musicVolume = evolcore.musicVolume
+
+
+--- **Curses**
+
+curses = {}
+
+--- Inits evöL in curses mode
+-- evol.curses.init(w,h,font,size)
+-- w,h: width and height of the terminal, in characters.
+-- font: string containing the path to the font to use
+-- size: the desired font height in pixels
+-- Sets the values evol.width, evol.height (screen size in pixels)
+-- Sets the values evol.nw, evol.nh (terminal size in characters)
+curses.init = function(w,h,font,size)
+	nw = w
+	nh = h
+	cw, ch = evolcore.curses_init(w,h,font,size)
+	width = nw * cw
+	height = nh * ch
+end
+
+--- Prints the terminal to the screen
+-- evol.curses.refresh()
+-- (evol.flip() is still needed)
+curses.refresh = evolcore.curses_refresh
+
+--- Add a character at given position
+-- evol.curses.addch(char,x,y)
+-- char: a string containing the character to be printed
+-- x,y: the position where to print the character, in the range (0,evol.nw), (0,evol.nh)
+curses.addch = evolcore.curses_addch
+
+--- Set the color at given position
+-- evol.curses.setcol(x,y,r,g,b,br,bg,bb)
+-- x,y: position where to change the color
+-- r,g,b: the text color
+-- br,bg,bb: the background color
+-- Each of the 6 color values is unmodified if negative or nil
+curses.setcol = evolcore.curses_setcol
+
+--- Prints a string
+-- evol.curses.print(str,x,y,[transpkey])
+-- str: the string to print
+-- x,y: the starting position (first character)
+-- transpkey: a one character long string. If present, indicates a transparent character that is not printed
+curses.print = function(str,x,y,transpkey)
+	
+	for i = 1,#str do
+		local char = str:sub(i,i)
+		if char ~= transpkey then
+			evolcore.curses_addch(char,x+i-1,y)
+		end
+	end
+end
+
+
+--- Fills a rectangle character/color
+-- evol.curses.fill(rect, [char, [fg, [bg]]])
+-- rect = {x,y,w,h}: portion of screen to fill. Defaults to entire screen.
+-- char: string containing the one character to fill the rectangle with. May be ommited to leave the text unchanged.
+-- fg = {r,g,b}: text color to fill with. May be ommited.
+-- bg = {r,g,b}: background color to fill with. May be ommited.
+curses.fill = function(rect,char,fg,bg)
+	local fg = fg or {}
+	local bg = bg or {}
+	local rect = rect or {0,0,nw,nh}
+	
+	evolcore.curses_fill(
+		rect[1],rect[2],rect[3],rect[4],
+		char,
+		fg[1],fg[2],fg[3],
+		bg[1],bg[2],bg[3]
+	)
+end
+

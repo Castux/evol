@@ -31,17 +31,25 @@ Font object
 font = evol.loadFont(path,size)
 evol.write(font,text,x,y,[color,[image]]) or font:write(text,x,y,[color,[image]])
 
-*Graphic primitives*
+**Graphic primitives**
 evol.line(x,y,u,v,[color,[aa,[image]]])
 evol.box(x,y,u,v,color,[fill,[image]])
 evol.circle(x,y,r,color,[aa,[fill,[image]]])
 evol.tri(x,y,u,v,m,n,color,[aa,[fill,[image]]])
 
-*Sound*
+**Sound**
 sound = evol.loadSound(path)
 music = evol.loadMusic(path)
 evol.play(stuff,n)
 old = evol.musicVolume(new)
+
+**Curses**
+evol.curses.init(w,h,font,size)
+evol.curses.refresh()
+evol.curses.addch(char,x,y)
+evol.curses.setcol(x,y,r,g,b,br,bg,bb)
+evol.curses.print(str,x,y,[transpkey])
+evol.curses.fill(rect, [char, [fg, [bg]]])
 
 
 Detailed reference
@@ -55,6 +63,7 @@ evol.init(w,h,[full,[gl]])
 	w,h: width and height in pixels of the desired window
 	full: if true, gets fullscreen mode
 	gl: if true, enables OpenGL
+	Sets the values evol.width and evol.height
 
 dt,fps,t = evol.timer([fpsmax])
 	Timer utility function
@@ -189,7 +198,7 @@ evol.write(font,text,x,y,[color,[image]]) or font:write(text,x,y,[color,[image]]
 	color = {r,g,b}: color to render the text in. Defaults to black.
 	image: destination image. Defaults to screen. 
 
-*Graphic primitives*
+**Graphic primitives**
 
 evol.line(x,y,u,v,[color,[aa,[image]]])
 	Draws a line
@@ -225,7 +234,7 @@ evol.tri(x,y,u,v,m,n,color,[aa,[fill,[image]]])
 	fill: = {r,g,b,[a]}: color of the filling. If nil, no filling.
 	image: the image to draw to. Defaults to screen.
 
-*Sound*
+**Sound**
 
 sound = evol.loadSound(path)
 	Loads a sound
@@ -248,4 +257,49 @@ old = evol.musicVolume(new)
 
 	new: if from 0 to 128, sets the volume this value. Else, does nothing.
 	old: volume before changing, or current volume if new isn't between 0 and 128.
+
+**Curses**
+
+evol.curses.init(w,h,font,size)
+	Inits evöL in curses mode
+
+	w,h: width and height of the terminal, in characters.
+	font: string containing the path to the font to use
+	size: the desired font height in pixels
+	Sets the values evol.width, evol.height (screen size in pixels)
+	Sets the values evol.nw, evol.nh (terminal size in characters)
+
+evol.curses.refresh()
+	Prints the terminal to the screen
+
+	(evol.flip() is still needed)
+
+evol.curses.addch(char,x,y)
+	Add a character at given position
+
+	char: a string containing the character to be printed
+	x,y: the position where to print the character, in the range (0,evol.nw), (0,evol.nh)
+
+evol.curses.setcol(x,y,r,g,b,br,bg,bb)
+	Set the color at given position
+
+	x,y: position where to change the color
+	r,g,b: the text color
+	br,bg,bb: the background color
+	Each of the 6 color values is unmodified if negative or nil
+
+evol.curses.print(str,x,y,[transpkey])
+	Prints a string
+
+	str: the string to print
+	x,y: the starting position (first character)
+	transpkey: a one character long string. If present, indicates a transparent character that is not printed
+
+evol.curses.fill(rect, [char, [fg, [bg]]])
+	Fills a rectangle character/color
+
+	rect = {x,y,w,h}: portion of screen to fill. Defaults to entire screen.
+	char: string containing the one character to fill the rectangle with. May be ommited to leave the text unchanged.
+	fg = {r,g,b}: text color to fill with. May be ommited.
+	bg = {r,g,b}: background color to fill with. May be ommited.
 
