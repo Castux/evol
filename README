@@ -71,7 +71,8 @@ Then run 'lua yourscript.lua' from its directory.
 Documentation
 -------------
 
-You can find an API reference in the file API-reference.txt (automatically generated using the makedoc.lua script), and the skeleton of a basic program you can use to start in example.lua. You can see the names of the keys in evol_keys.lua, they are basically the SDL constants names in lower case, prefixed with "key" instead of "SDLK".
+You can find an API reference in the file API-reference.txt (automatically generated using the makedoc.lua script), and the skeleton of a basic programs you can use to start in the Examples directory. (Note that the example_gl.lua program requires LuaGL to be installed).
+You can see the names of the keys in evol_keys.lua, they are basically the SDL constants names in lower case, prefixed with "key" instead of "SDLK".
 
 Feedback
 --------
