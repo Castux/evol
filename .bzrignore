@@ -1,2 +1,5 @@
 .sconsign.dblite
 evolcore.os
+Examples/evolcore.so
+Examples/evol_keys.lua
+Examples/evol.lua
