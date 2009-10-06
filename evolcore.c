@@ -278,7 +278,7 @@ static int l_loadImage(lua_State *L)
 	surf = SDL_DisplayFormatAlpha(tmp);
 	SDL_FreeSurface(tmp);
 	
-	lua_pushnumber(L, (int)surf );
+	lua_pushlightuserdata(L, surf);
 	lua_pushnumber(L, surf->w);
 	lua_pushnumber(L, surf->h);
 	
@@ -303,7 +303,7 @@ static int l_makeSurf(lua_State *L)
 	surf = SDL_DisplayFormatAlpha(tmp);
 	SDL_FreeSurface(tmp);
 		
-	lua_pushnumber(L, (int)surf );
+	lua_pushlightuserdata(L, surf);
 	lua_pushnumber(L, surf->w);
 	lua_pushnumber(L, surf->h);
 	
@@ -315,10 +315,10 @@ static int l_blit(lua_State *L)
 	SDL_Surface *surf, *dest;
 	SDL_Rect rect;
 	
-	surf = (SDL_Surface *)(int) lua_tonumber(L, 1);
+	surf = (SDL_Surface *) lua_touserdata(L, 1);
 	rect.x = lua_tonumber(L, 2);
 	rect.y = lua_tonumber(L, 3);
-	dest = (SDL_Surface *)(int) lua_tonumber(L, 4);
+	dest = (SDL_Surface *) lua_touserdata(L, 4);
 	
 	if(dest == NULL)
 		dest = gScreen;
@@ -335,7 +335,7 @@ static int l_freeSurf(lua_State *L)
 {
 	SDL_Surface *surf;
 	
-	surf = (SDL_Surface *)(int) lua_tonumber(L, 1);
+	surf = (SDL_Surface *) lua_touserdata(L, 1);
 	
 	SDL_FreeSurface(surf);
 	
@@ -402,7 +402,7 @@ static int l_putpix(lua_State *L)
 	g = lua_tonumber(L, 4);
 	b = lua_tonumber(L, 5);
 	a = lua_tonumber(L, 6);
-	surf = (SDL_Surface *)(int) lua_tonumber(L, 7);
+	surf = (SDL_Surface *) lua_touserdata(L, 7);
 	
 	if(surf == NULL)
 		surf = gScreen;
@@ -440,7 +440,7 @@ static int l_loadFont(lua_State *L)
 	}
 
 	
-	lua_pushnumber(L, (int)font );
+	lua_pushlightuserdata(L, font);
 	lua_pushnumber(L, width);
 	return 2;
 }
@@ -454,14 +454,14 @@ static int l_printFont(lua_State *L)
 	SDL_Rect rect;
 
 
-	font = (TTF_Font *)(int) lua_tonumber(L, 1);
+	font = (TTF_Font *) lua_touserdata(L, 1);
 	string = lua_tostring(L, 2);
 	color.r = lua_tonumber(L, 3);
 	color.g = lua_tonumber(L, 4);
 	color.b = lua_tonumber(L, 5);	
 	rect.x = lua_tonumber(L, 6);
 	rect.y = lua_tonumber(L, 7);
-	dest = (SDL_Surface *)(int) lua_tonumber(L, 8);
+	dest = (SDL_Surface *) lua_touserdata(L, 8);
 	
 	if(dest == NULL)
 		dest = gScreen;
@@ -481,7 +481,7 @@ static int l_freeFont(lua_State *L)
 {
 	TTF_Font *font;
 	
-	font = (TTF_Font *)(int) lua_tonumber(L, 1);
+	font = (TTF_Font *) lua_touserdata(L, 1);
 	TTF_CloseFont(font);
 	
 	return 0;
@@ -520,7 +520,7 @@ static int l_draw (lua_State *L)
 	type = lua_tonumber(L, 9);
 	aa_fill = lua_tonumber(L, 10);
 
-	surf = (SDL_Surface *)(int) lua_tonumber(L, 11);	
+	surf = (SDL_Surface *) lua_touserdata(L, 11);	
 	
 	if(surf == NULL)
 		surf = gScreen;
@@ -565,7 +565,7 @@ static int l_drawTri (lua_State *L)
 	a = lua_tonumber(L, 10);
 	aa_fill = lua_tonumber(L, 11);
 
-	surf = (SDL_Surface *)(int) lua_tonumber(L, 12);	
+	surf = (SDL_Surface *) lua_touserdata(L, 12);	
 	
 	if(surf == NULL)
 		surf = gScreen;
@@ -598,7 +598,7 @@ static int l_loadSound (lua_State *L)
 		exit(EXIT_FAILURE);
 	}
 	
-	lua_pushnumber(L, (int)sound );
+	lua_pushlightuserdata(L, sound);
 	return 1;
 }
 
@@ -610,7 +610,7 @@ static int l_playSound (lua_State *L)
 	if(!sound_on)
 		return 0;
 	
-	sound = (Mix_Chunk *)(int) lua_tonumber(L, 1),
+	sound = (Mix_Chunk *) lua_touserdata(L, 1),
 	loop = lua_tonumber(L, 2);
 	
 	Mix_PlayChannel(-1, sound, loop);
@@ -625,7 +625,7 @@ static int l_freeSound (lua_State *L)
 	if(!sound_on)
 		return 0;
 	
-	sound = (Mix_Chunk *)(int) lua_tonumber(L, 1),
+	sound = (Mix_Chunk *) lua_touserdata(L, 1),
 	
 	Mix_FreeChunk(sound);
 	
@@ -649,7 +649,7 @@ static int l_loadMusic (lua_State *L)
 		exit(EXIT_FAILURE);
 	}
 	
-	lua_pushnumber(L, (int)music );
+	lua_pushlightuserdata(L, music);
 	return 1;
 }
 
@@ -661,7 +661,7 @@ static int l_playMusic (lua_State *L)
 	if(!sound_on)
 		return 0;
 	
-	music = (Mix_Music *)(int) lua_tonumber(L, 1),
+	music = (Mix_Music *) lua_touserdata(L, 1),
 	loop = lua_tonumber(L, 2);
 	
 	Mix_PlayMusic(music, loop);
@@ -707,7 +707,7 @@ static int l_freeMusic (lua_State *L)
 	if(!sound_on)
 		return 0;
 	
-	music = (Mix_Music *)(int) lua_tonumber(L, 1);
+	music = (Mix_Music *) lua_touserdata(L, 1);
 	
 	
 	Mix_FreeMusic(music);
