@@ -470,12 +470,25 @@ static int l_printFont(lua_State *L)
 	
 	text = TTF_RenderUTF8_Blended(font, string, color);
 	
-	rect.w = text->w;
-	rect.h = text->h;
-	
-	SDL_BlitSurface(text, NULL, dest, &rect);
-	SDL_FreeSurface(text);
-	
+	if(!new)
+	{
+		rect.w = text->w;
+		rect.h = text->h;
+		
+		SDL_BlitSurface(text, NULL, dest, &rect);
+		SDL_FreeSurface(text);
+		
+		return 0;
+	}
+	else
+	{
+		lua_pushlightuserdata(L, text);
+		lua_pushnumber(L, text->w);
+		lua_pushnumber(L, text->h);
+		
+		return 3;
+	}
+	/* Shouldn't get there */
 	return 0;
 }
 

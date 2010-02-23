@@ -271,7 +271,18 @@ write = function(font, text, x, y, color, surf)
 		surf = {}
 	end
 	
-	evolcore.printFont(font.font, text, color[1], color[2], color[3], x, y, surf.surf, new)
+	local img,w,h = evolcore.printFont(font.font, text, color[1], color[2], color[3], x, y, surf.surf, new)
+	
+	-- If we requested a new image, we have to make it look like one
+	if new then
+		local tmp = Image()
+		tmp.surf, tmp.w, tmp.h = img,w,h
+		
+		tmp.cx = 0
+		tmp.cy = tmp.h
+		
+		return tmp
+	end
 end
 
 --- **Graphic primitives**
