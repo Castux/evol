@@ -61,8 +61,7 @@ free = function(stuff)
 	elseif stuff.type == "Music" then
 		evolcore.freeMusic(stuff.music)
 	end
-	
-	stuff = nil
+
 end
 
 --- Shuts down evöL
@@ -90,7 +89,7 @@ flip = evolcore.flip
 
 -- INTERNAL! -- Prepares an Image table
 local Image = function()
-	tmp = {}
+	local tmp = {}
 	tmp.blit = blit
 	tmp.free = free
 	tmp.fill = function(image,color,rect)
@@ -111,7 +110,7 @@ end
 -- path: string containing the path to the image to load (relative to current folder, or absolute)
 -- image: the created image
 loadImage = function(path)
-	tmp = Image()
+	local tmp = Image()
 	tmp.surf, tmp.w, tmp.h = evolcore.loadImage(path)
 	
 	tmp.cx = tmp.w / 2
@@ -125,7 +124,7 @@ end
 -- w,h: width and height of the image to create
 -- image: the created image
 makeImage = function(w,h)
-	tmp = Image()
+	local tmp = Image()
 	tmp.surf, tmp.w, tmp.h = evolcore.makeSurf(w,h)
 	
 	tmp.cx = tmp.w / 2
@@ -141,8 +140,8 @@ end
 -- img: image to fill. Defaults to screen.
 fill = function(color, rect, img)
 	
-	img = img or {}
-	rect = rect or {0,0,0,0}
+	local img = img or {}
+	local rect = rect or {0,0,0,0}
 	
 	if not color[4] then color[4] = 255 end		-- RGB are opaque by default
 	
@@ -154,10 +153,10 @@ end
 -- x,y: position in pixels where to put the center of the image to. Defaults to image center, so that it is put in the top left corner.
 -- dest: destination image. Defaults to screen.
 blit = function(image, x, y, dest)
-
-	if not dest then dest = {} end
-	if not x then x = image.cx end
-	if not y then y = image.cy end
+	
+	local dest = dest or {}
+	local x = x or image.cx
+	local y = y or image.cy 
 		
 	evolcore.blit(image.surf, x-image.cx, y-image.cy, dest.surf)
 end
@@ -169,7 +168,7 @@ end
 -- image: the image to modify. Defaults to screen.
 putpix = function(x, y, color, img)
 	
-	img = img or {}
+	local img = img or {}
 	if not color[4] then color[4] = 255 end
 	
 	evolcore.putpix(x, y, color[1],color[2],color[3],color[4], img.surf)
@@ -233,7 +232,7 @@ isKeyDown = evolcore.isKeyDown
 
 -- INTERNAL! -- Prepares a Font table
 local Font = function()
-	tmp = {}
+	local tmp = {}
 	
 	tmp.write = write
 	tmp.free = free
@@ -246,11 +245,9 @@ end
 --- Loads a font
 -- font = evol.loadFont(path,size)
 -- path: string containing the path to the font to load (relative to current folder, or absolute)
--- size: number of pixels high the fo--- Loads a font
--- font = evol.loadFont(path,size)
--- path: string containing the path to the font to load (relative to current folder, or absolute)nt should render in later
+-- size: number of pixels high the font should render in later
 loadFont = function(path, size)
-	tmp = Font()
+	local tmp = Font()
 	tmp.font,tmp.width = evolcore.loadFont(path, size)
 
 	return tmp
@@ -262,13 +259,19 @@ end
 -- text: UTF-8 string to render
 -- x,y: position in pixels where the top-left corner of render text should appear
 -- color = {r,g,b}: color to render the text in. Defaults to black.
--- image: destination image. Defaults to screen. 
+-- image: destination image. Defaults to screen. Put 'new' to get a new surface.
 write = function(font, text, x, y, color, surf)
 	
-	surf = surf or {}
-	color = color or {0,0,0}
+	local surf = surf or {}
+	local color = color or {0,0,0}
+	local new = false
 	
-	evolcore.printFont(font.font, text, color[1], color[2], color[3], x, y, surf.surf)
+	if surf == 'new' then
+		new = true
+		surf = {}
+	end
+	
+	evolcore.printFont(font.font, text, color[1], color[2], color[3], x, y, surf.surf, new)
 end
 
 --- **Graphic primitives**
@@ -281,10 +284,9 @@ end
 -- image: the image to draw to. Defaults to screen.
 line = function(x, y, u, v, color, aa, surf)
 	
-	surf = surf or {}
-	color = color or {0,0,0}
-	
-	if aa then aa = 1 else aa = 0 end
+	local surf = surf or {}
+	local color = color or {0,0,0}
+	local aa = aa and 1 or 0
 	
 	if not color[4] then color[4] = 255 end		-- RGB are opaque by default
 	
@@ -299,7 +301,7 @@ end
 -- image: the image to draw to. Defaults to screen.
 box = function(x, y, u, v, color, fill, surf)
 	
-	surf = surf or {}
+	local surf = surf or {}
 	
 	if color and not color[4] then color[4] = 255 end	-- RGB are opaque by default
 	if fill and not fill[4] then fill[4] = 255 end		-- RGB are opaque by default
@@ -322,7 +324,7 @@ end
 -- image: the image to draw to. Defaults to screen.
 circle = function(x, y, r, color, aa, fill, surf)
 
-	surf = surf or {}
+	local surf = surf or {}
 
 	if color and not color[4] then color[4] = 255 end	-- RGB are opaque by default
 	if fill and not fill[4] then fill[4] = 255 end		-- RGB are opaque by default
@@ -347,7 +349,7 @@ end
 -- image: the image to draw to. Defaults to screen.
 tri = function(x, y, u, v, m, n, color, aa, fill, surf)
 
-	surf = surf or {}
+	local surf = surf or {}
 
 	if color and not color[4] then color[4] = 255 end	-- RGB are opaque by default
 	if fill and not fill[4] then fill[4] = 255 end		-- RGB are opaque by default
@@ -367,7 +369,7 @@ end
 
 -- INTERNAL! -- Prepares a Sound table
 local Sound = function()
-	tmp = {}
+	local tmp = {}
 	
 	tmp.play = play
 	tmp.free = free
@@ -379,7 +381,7 @@ end
 
 -- INTERNAL! -- Prepares a Music table
 local Music = function()
-	tmp = {}
+	local tmp = {}
 	
 	tmp.play = play
 	tmp.free = free
@@ -393,7 +395,7 @@ end
 -- sound = evol.loadSound(path)
 -- path: string containing the path to the sound to load (relative to current folder, or absolute)
 loadSound = function(path)
-	tmp = Sound()
+	local tmp = Sound()
 	tmp.sound = evolcore.loadSound(path)
 	
 	return tmp
@@ -403,7 +405,7 @@ end
 -- music = evol.loadMusic(path)
 -- path: string containing the path to the music to load (relative to current folder, or absolute)
 loadMusic = function(path)
-	tmp = Music()
+	local tmp = Music()
 	tmp.music = evolcore.loadMusic(path)
 	
 	return tmp

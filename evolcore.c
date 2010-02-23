@@ -157,7 +157,7 @@ static int l_fill (lua_State *L)
 	g = lua_tonumber(L, 6);
 	b = lua_tonumber(L, 7);
 	a = lua_tonumber(L, 8);
-	surf = (SDL_Surface *)(int) lua_tonumber(L, 9);
+	surf = (SDL_Surface *)(int) lua_touserdata(L, 9);
 	
 	if(rect.w != 0 && rect.h != 0)
 		ptr = &rect;
@@ -182,7 +182,7 @@ static int l_flip (lua_State *L)
 
 
 
-/* Dealing with events: return type of even (1,2,3,4) and parameters */
+/* Dealing with events: return type of event (1,2,3,4) and parameters */
 
 static int l_input (lua_State *L)
 {
@@ -452,6 +452,7 @@ static int l_printFont(lua_State *L)
 	const char *string;
 	SDL_Color color;
 	SDL_Rect rect;
+	int new;
 
 
 	font = (TTF_Font *) lua_touserdata(L, 1);
@@ -462,6 +463,7 @@ static int l_printFont(lua_State *L)
 	rect.x = lua_tonumber(L, 6);
 	rect.y = lua_tonumber(L, 7);
 	dest = (SDL_Surface *) lua_touserdata(L, 8);
+	new = lua_toboolean(L, 9);
 	
 	if(dest == NULL)
 		dest = gScreen;
