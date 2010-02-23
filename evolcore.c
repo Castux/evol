@@ -448,7 +448,7 @@ static int l_loadFont(lua_State *L)
 static int l_printFont(lua_State *L)
 {
 	TTF_Font *font;
-	SDL_Surface *text, *dest;
+	SDL_Surface *text, *dest, *surf;
 	const char *string;
 	SDL_Color color;
 	SDL_Rect rect;
@@ -481,10 +481,13 @@ static int l_printFont(lua_State *L)
 		return 0;
 	}
 	else
-	{
-		lua_pushlightuserdata(L, text);
-		lua_pushnumber(L, text->w);
-		lua_pushnumber(L, text->h);
+	{	
+		surf = SDL_DisplayFormatAlpha(text);
+		SDL_FreeSurface(text);
+		
+		lua_pushlightuserdata(L, surf);
+		lua_pushnumber(L, surf->w);
+		lua_pushnumber(L, surf->h);
 		
 		return 3;
 	}
