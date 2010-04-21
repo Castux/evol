@@ -36,6 +36,9 @@ int sound_on = 1;
 int gl_on = 0;
 int curses_on = 0;
 
+int gNumpads;
+SDL_Joystick  **gPads;
+
 typedef struct{
 	
 	TTF_Font *font;
@@ -57,6 +60,7 @@ CursesContext CC;
 static int l_init (lua_State *L)
 {
 	int w,h,full;
+	int i;
 	
 	w = lua_tonumber(L, 1);
 	h = lua_tonumber(L, 2);
@@ -72,32 +76,32 @@ static int l_init (lua_State *L)
 	
 	/* Init SDL */
 		
-	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO) < 0 )
+	if( SDL_Init(SDL_INIT_VIDEO|SDL_INIT_AUDIO|SDL_INIT_JOYSTICK) < 0 )
 	{
 		printf("Couldn't initialize SDL: %s\n", SDL_GetError());
 		exit(1);
-        }
+	}
 	
 	/* Set video mode */
         
-        if(full)
+	if(full)
 	{
 		full = SDL_FULLSCREEN;
 	}
 	
-        if(gl_on)
+	if(gl_on)
 	{
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		gl_on = SDL_OPENGL;
 	}
-	        
-        gScreen=SDL_SetVideoMode(w,h,32, SDL_HWSURFACE|SDL_DOUBLEBUF|full|gl_on);
-        
-        if(gScreen == NULL)
+		
+	gScreen=SDL_SetVideoMode(w,h,32, SDL_HWSURFACE|SDL_DOUBLEBUF|full|gl_on);
+
+	if(gScreen == NULL)
 	{
 		printf("Couldn't set %dx%d video mode: %s\n", w, h, SDL_GetError());
 		exit(1);
-        }
+	}
 	
 	/* SDL_ttf */
 	
@@ -105,7 +109,7 @@ static int l_init (lua_State *L)
 	{
 		printf("Couldn't initialize SDL_ttf: %s\n", TTF_GetError());
 		exit(1);
-        }
+	}
 	
 	/* SDL_mixer */
 	
@@ -116,11 +120,27 @@ static int l_init (lua_State *L)
 		/* exit(1); */
 	}
 	
+	/* Gamepads */
+	gNumpads = SDL_NumJoysticks();
+	if(gNumpads > 0)
+	{
+		gPads = malloc(gNumpads * sizeof(SDL_Joystick *));
+		
+		for(i = 0; i < gNumpads; i++)
+		{
+			gPads[i] = SDL_JoystickOpen(i);
+		}
+		
+		printf("Detected %d gamepads\n", gNumpads);
+	}
+	
 	return 0;	/* 0 return values */
 }
 
 static int l_quit (lua_State *L)
 {
+	int i;
+	
 	printf("evöL quit\n");
 	
 	if(curses_on)
@@ -133,6 +153,15 @@ static int l_quit (lua_State *L)
 	
 	Mix_CloseAudio();
 	TTF_Quit(); 
+	
+	/* Gamepads */
+	if(gNumpads > 0)
+	{
+		for(i = 0; i < gNumpads; i++)
+			SDL_JoystickClose(gPads[i]);
+			
+		free(gPads);
+	}
 	
 	SDL_Quit();
 	return 0;	/* 0 return values */
@@ -217,10 +246,40 @@ static int l_input (lua_State *L)
 				return 4;
 				break;
 			case SDL_MOUSEMOTION:
+				lua_pushnumber(L, 5);
+				lua_pushnumber(L, e.motion.x);
+				lua_pushnumber(L, e.motion.y);
+				lua_pushnumber(L, e.motion.xrel);
+				lua_pushnumber(L, e.motion.yrel);
+				return 5;
 				break;
+			case SDL_JOYAXISMOTION:
+				lua_pushnumber(L, 6);
+				lua_pushnumber(L, e.jaxis.which);
+				lua_pushnumber(L, e.jaxis.axis);
+				lua_pushnumber(L, e.jaxis.value);
+				return 4;
+			case SDL_JOYHATMOTION:
+				lua_pushnumber(L, 7);
+				lua_pushnumber(L, e.jhat.which);
+				lua_pushnumber(L, e.jhat.hat);
+				lua_pushboolean(L, e.jhat.value & SDL_HAT_UP);
+				lua_pushboolean(L, e.jhat.value & SDL_HAT_RIGHT);
+				lua_pushboolean(L, e.jhat.value & SDL_HAT_DOWN);
+				lua_pushboolean(L, e.jhat.value & SDL_HAT_LEFT);
+				return 7;
+			case SDL_JOYBUTTONDOWN:
+				lua_pushnumber(L, 8);
+				lua_pushnumber(L, e.jbutton.which);
+				lua_pushnumber(L, e.jbutton.button);
+				return 3;
+			case SDL_JOYBUTTONUP:
+				lua_pushnumber(L, 9);
+				lua_pushnumber(L, e.jbutton.which);
+				lua_pushnumber(L, e.jbutton.button);
+				return 3;
 			case SDL_QUIT:
 				exit(0);
-				break;
 			default:
 				break;
 		}

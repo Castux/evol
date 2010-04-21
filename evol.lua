@@ -185,17 +185,15 @@ end
 -- kup(key): key up event (key: the key released)
 -- mdown(x,y,b): mouse button down event (x,y: mouse coordinates, b: mouse button number)
 -- mup(x,y,b): mouse button up event (x,y: mouse coordinates, b: mouse button number)
-input = function(table)
+input = function(tab)
 	
-	local ret,a,b,c = evolcore.input()
-
-	-- return value of 0 means no event
-	if ret == 0 then return end
+	local arg = {evolcore.input()}
 	
-	-- otherwise, call the callback if it is not nil
-	-- print("ret", ret)
+	if arg[1] == 0 then
+		return
+	end
 	
-	if table[ret] then table[ret](a,b,c) end
+	return arg
 end
 
 --- Queries for mouse position and optionally the status of a button
