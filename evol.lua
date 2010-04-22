@@ -34,8 +34,8 @@ init = function(w,h,full,gl)
 	
 	-- Init vinput system
 	
-	vkeys = {}
 	vhats = {}	-- indexed as padnum-hatnum, ie '0-0'
+	vmap = nil	-- last map used
 end
 
 --- Timer utility function
@@ -215,13 +215,18 @@ input = function()
 end
 
 --- Polls one event, maps it to virtual buttons/axes, and returns information
--- event = evol.vinput(map)
--- event can be a list of events (hats can generate several at the same time)
+-- events = evol.vinput(map)
+-- events is a list of events (hats and mouse can generate several at the same time)
+-- Returns nil if no virtual event happened
 
 vinput = function(map)
 
 	local e = input()
 	local vkey,dir
+	local list = {}
+	
+	-- save last map used
+	vmap = map	
 	
 	if not e then return end
 	
@@ -232,19 +237,29 @@ vinput = function(map)
 	-- key
 	if e[1] == 'kdown' or e[1] == 'kup' then
 		vkey = map.keyboard and map.keyboard[e[2]]
-		
 		dir = e[1] == 'kdown' and 'down' or 'up'
-	
-	-- button
+		
+	-- gamepad button
 	elseif e[1] == 'bdown' or e[1] == 'bup' then
 		local g = 'gamepad' .. e[2]
 
 		vkey = map[g] and map[g].buttons and map[g].buttons[e[3]]
-		
 		dir = e[1] == 'bdown' and 'down' or 'up'
 	
+	-- mouse button
+	elseif e[1] == 'mdown' or e[1] == 'mup' then
+		vkey = map.mousebuttons and map.mousebuttons[e[4]]
+		dir = e[1] == 'mdown' and 'down' or 'up'
+	
+	end
+	
+	if vkey then
+		table.insert(list, {vkey,dir})
+	end
+	
+	
 	-- hat. tougher.
-	elseif e[1] == 'hat' then
+	if e[1] == 'hat' then
 		local index = e[2] .. '-' .. e[3]
 		local g = 'gamepad' .. e[2]
 		local h = 'hat' .. e[3]
@@ -254,14 +269,20 @@ vinput = function(map)
 		local new = {e[4],e[5],e[6],e[7]}
 		
 		for i = 1,4 do
+			vkey,dir = nil,nil
+			
 			if not old[i] and new[i] then
 				vkey = map[g] and map[g][h] and map[g][h][i]
 				dir = 'down'
-				break
+				
 			elseif old[i] and not new[i] then
 				vkey = map[g] and map[g][h] and map[g][h][i]
 				dir = 'up'
-				break
+				
+			end
+			
+			if vkey then
+				table.insert(list, {vkey,dir})
 			end
 		end
 		
@@ -269,19 +290,80 @@ vinput = function(map)
 		vhats[index] = new
 	end
 	
-	-- save button state
-	if vkey then
-		vkeys[vkey] = dir
-	end
-	
-	
+		
 	--
 	-- virtual axes
 	--
 	
+	local axis,val,relval
 	
-	return vkey,dir
+	if e[1] == 'mmotion' then
+		
+		if e[4] ~= 0 then
+			axis = map.mousex
+			val = e[2]
+			relval = e[4]		
+		
+			table.insert(list, {axis,val,relval})
+		end
+		
+		if e[5] ~= 0 then
+			axis = map.mousey
+			val = e[3]
+			relval = e[5]		
+		
+			table.insert(list, {axis,val,relval})
+		end
+		
+	-- gamepad axis
+	elseif e[1] == 'axis' then
+		local g = 'gamepad' .. e[2]
+		local a = 'axis' .. e[3]
+		
+		axis = map[g] and map[g][a]
+		
+		local old = vmap.vaxes[axis] or 0
+		val = e[4]
+		relval = e[4] - old
+		
+		if axis and relval ~= 0 then
+			table.insert(list, {axis,val,relval})
+		end
+		
+	end
 	
+	
+	-- save axis or button states
+	
+	map.vkeys = map.vkeys or {}		-- in case they don't exist
+	map.vaxes = map.vaxes or {}
+	
+	for i,v in ipairs(list) do
+		if #v == 2 then
+			map.vkeys[v[1]] = v[2]
+		
+		else
+			map.vaxes[v[1]] = v[2]
+		end			
+	end
+	
+	
+	if #list > 0 then
+		return list
+	end
+end
+
+
+--- Returns the state of a virtual key/axis in the last mapping used
+-- state = evol.vstate(v)
+-- v: a virtual key or axis
+-- state: 'down' or 'up' for a vkey, a number for an axis
+-- Note that if not initialised manually in the map, axes and buttons
+-- have a nil value until their first related event
+vstate = function(v)
+	if not vmap then return end
+	
+	return vmap.vkeys[v] or vmap.vaxes[v]
 end
 
 --- Queries for mouse position and optionally the status of a button
