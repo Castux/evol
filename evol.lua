@@ -31,6 +31,11 @@ init = function(w,h,full,gl)
 	width = w
 	height = h
 	evolcore.init(w,h,full,gl)
+	
+	-- Init vinput system
+	
+	vkeys = {}
+	vhats = {}	-- indexed as padnum-hatnum, ie '0-0'
 end
 
 --- Timer utility function
@@ -177,23 +182,106 @@ end
 --- **Input**
 
 
---- Polls events and call the associated callback functions
--- evol.input(callbacks)
--- callbacks = {kdown, kup, mdown, mup}: table of callback functions. Each of those can be nil if not needed.
--- Event details are passed to the functions as follows:
--- kdown(key): key down event (key: the key pressed)
--- kup(key): key up event (key: the key released)
--- mdown(x,y,b): mouse button down event (x,y: mouse coordinates, b: mouse button number)
--- mup(x,y,b): mouse button up event (x,y: mouse coordinates, b: mouse button number)
-input = function(tab)
+--- Polls one event and returns raw information
+-- event = evol.input()
+-- {'kdown', keyname}
+-- {'kup', keyname}
+-- {'mdown',x,y,button}
+-- {'mup',x,y,button}
+-- {'mmotion',x,y,xrel,yrel}
+-- {'axis',padnumber,axisnumer,value}
+-- {'hat',padnumber,hatnumer,up,right,down,left}
+-- {'bdown',padnumber,buttonnumber}
+-- {'bup',padnumber,buttonnumber}
+
+local event_names = {'kdown','kup','mdown','mup','mmotion','axis','hat','bdown','bup'}
+
+input = function()
 	
 	local arg = {evolcore.input()}
-	
+		
 	if arg[1] == 0 then
 		return
+	
+	-- convert key numbers into key names
+	elseif arg[1] == 1 or arg[1] == 2 then
+		arg[2] = keys[arg[2]]
 	end
 	
+	-- convert event numbers into event names
+	arg[1] = event_names[arg[1]]
+	
 	return arg
+end
+
+--- Polls one event, maps it to virtual buttons/axes, and returns information
+-- event = evol.vinput(map)
+-- event can be a list of events (hats can generate several at the same time)
+
+vinput = function(map)
+
+	local e = input()
+	local vkey,dir
+	
+	if not e then return end
+	
+	--
+	-- deal with virtual buttons first
+	--
+	
+	-- key
+	if e[1] == 'kdown' or e[1] == 'kup' then
+		vkey = map.keyboard and map.keyboard[e[2]]
+		
+		dir = e[1] == 'kdown' and 'down' or 'up'
+	
+	-- button
+	elseif e[1] == 'bdown' or e[1] == 'bup' then
+		local g = 'gamepad' .. e[2]
+
+		vkey = map[g] and map[g].buttons and map[g].buttons[e[3]]
+		
+		dir = e[1] == 'bdown' and 'down' or 'up'
+	
+	-- hat. tougher.
+	elseif e[1] == 'hat' then
+		local index = e[2] .. '-' .. e[3]
+		local g = 'gamepad' .. e[2]
+		local h = 'hat' .. e[3]
+		
+		
+		local old = vhats[index] or {false,false,false,false}
+		local new = {e[4],e[5],e[6],e[7]}
+		
+		for i = 1,4 do
+			if not old[i] and new[i] then
+				vkey = map[g] and map[g][h] and map[g][h][i]
+				dir = 'down'
+				break
+			elseif old[i] and not new[i] then
+				vkey = map[g] and map[g][h] and map[g][h][i]
+				dir = 'up'
+				break
+			end
+		end
+		
+		-- save hat info
+		vhats[index] = new
+	end
+	
+	-- save button state
+	if vkey then
+		vkeys[vkey] = dir
+	end
+	
+	
+	--
+	-- virtual axes
+	--
+	
+	
+	return vkey,dir
+	
 end
 
 --- Queries for mouse position and optionally the status of a button

@@ -211,78 +211,77 @@ static int l_flip (lua_State *L)
 
 
 
-/* Dealing with events: return type of event (1,2,3,4) and parameters */
+/* Dealing with events: return type of event (1-9) and parameters */
 
 static int l_input (lua_State *L)
 {
 	SDL_Event e;
-
-	while(SDL_PollEvent(&e))
+	
+	SDL_PollEvent(&e);
+	
+	switch(e.type)
 	{
-		switch(e.type)
-		{
-			case SDL_KEYDOWN:
-				lua_pushnumber(L, 1);
-				lua_pushnumber(L, e.key.keysym.sym);
-				return 2;
-				break;
-			case SDL_KEYUP:
-				lua_pushnumber(L, 2);
-				lua_pushnumber(L, e.key.keysym.sym);
-				return 2;
-				break;
-			case SDL_MOUSEBUTTONDOWN:
-				lua_pushnumber(L, 3);
-				lua_pushnumber(L, e.button.x);
-				lua_pushnumber(L, e.button.y);
-				lua_pushnumber(L, e.button.button);
-				return 4;
-				break;
-			case SDL_MOUSEBUTTONUP:
-				lua_pushnumber(L, 4);
-				lua_pushnumber(L, e.button.x);
-				lua_pushnumber(L, e.button.y);
-				lua_pushnumber(L, e.button.button);
-				return 4;
-				break;
-			case SDL_MOUSEMOTION:
-				lua_pushnumber(L, 5);
-				lua_pushnumber(L, e.motion.x);
-				lua_pushnumber(L, e.motion.y);
-				lua_pushnumber(L, e.motion.xrel);
-				lua_pushnumber(L, e.motion.yrel);
-				return 5;
-				break;
-			case SDL_JOYAXISMOTION:
-				lua_pushnumber(L, 6);
-				lua_pushnumber(L, e.jaxis.which);
-				lua_pushnumber(L, e.jaxis.axis);
-				lua_pushnumber(L, e.jaxis.value);
-				return 4;
-			case SDL_JOYHATMOTION:
-				lua_pushnumber(L, 7);
-				lua_pushnumber(L, e.jhat.which);
-				lua_pushnumber(L, e.jhat.hat);
-				lua_pushboolean(L, e.jhat.value & SDL_HAT_UP);
-				lua_pushboolean(L, e.jhat.value & SDL_HAT_RIGHT);
-				lua_pushboolean(L, e.jhat.value & SDL_HAT_DOWN);
-				lua_pushboolean(L, e.jhat.value & SDL_HAT_LEFT);
-				return 7;
-			case SDL_JOYBUTTONDOWN:
-				lua_pushnumber(L, 8);
-				lua_pushnumber(L, e.jbutton.which);
-				lua_pushnumber(L, e.jbutton.button);
-				return 3;
-			case SDL_JOYBUTTONUP:
-				lua_pushnumber(L, 9);
-				lua_pushnumber(L, e.jbutton.which);
-				lua_pushnumber(L, e.jbutton.button);
-				return 3;
-			case SDL_QUIT:
-				exit(0);
-			default:
-				break;
-		}
+		case SDL_KEYDOWN:
+			lua_pushnumber(L, 1);
+			lua_pushnumber(L, e.key.keysym.sym);
+			return 2;
+			break;
+		case SDL_KEYUP:
+			lua_pushnumber(L, 2);
+			lua_pushnumber(L, e.key.keysym.sym);
+			return 2;
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			lua_pushnumber(L, 3);
+			lua_pushnumber(L, e.button.x);
+			lua_pushnumber(L, e.button.y);
+			lua_pushnumber(L, e.button.button);
+			return 4;
+			break;
+		case SDL_MOUSEBUTTONUP:
+			lua_pushnumber(L, 4);
+			lua_pushnumber(L, e.button.x);
+			lua_pushnumber(L, e.button.y);
+			lua_pushnumber(L, e.button.button);
+			return 4;
+			break;
+		case SDL_MOUSEMOTION:
+			lua_pushnumber(L, 5);
+			lua_pushnumber(L, e.motion.x);
+			lua_pushnumber(L, e.motion.y);
+			lua_pushnumber(L, e.motion.xrel);
+			lua_pushnumber(L, e.motion.yrel);
+			return 5;
+			break;
+		case SDL_JOYAXISMOTION:
+			lua_pushnumber(L, 6);
+			lua_pushnumber(L, e.jaxis.which);
+			lua_pushnumber(L, e.jaxis.axis);
+			lua_pushnumber(L, e.jaxis.value);
+			return 4;
+		case SDL_JOYHATMOTION:
+			lua_pushnumber(L, 7);
+			lua_pushnumber(L, e.jhat.which);
+			lua_pushnumber(L, e.jhat.hat);
+			lua_pushboolean(L, e.jhat.value & SDL_HAT_UP);
+			lua_pushboolean(L, e.jhat.value & SDL_HAT_RIGHT);
+			lua_pushboolean(L, e.jhat.value & SDL_HAT_DOWN);
+			lua_pushboolean(L, e.jhat.value & SDL_HAT_LEFT);
+			return 7;
+		case SDL_JOYBUTTONDOWN:
+			lua_pushnumber(L, 8);
+			lua_pushnumber(L, e.jbutton.which);
+			lua_pushnumber(L, e.jbutton.button);
+			return 3;
+		case SDL_JOYBUTTONUP:
+			lua_pushnumber(L, 9);
+			lua_pushnumber(L, e.jbutton.which);
+			lua_pushnumber(L, e.jbutton.button);
+			return 3;
+		case SDL_QUIT:
+			exit(0);
+		default:
+			break;
 	}
 	
 	lua_pushnumber(L, 0);
