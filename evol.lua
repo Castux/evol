@@ -226,7 +226,7 @@ vinput = function(map)
 	local list = {}
 	
 	-- save last map used
-	vmap = map	
+	vmap = map
 	
 	if not e then return end
 	
@@ -358,8 +358,8 @@ end
 -- state = evol.vstate(v)
 -- v: a virtual key or axis
 -- state: 'down' or 'up' for a vkey, a number for an axis
--- Note that if not initialised manually in the map, axes and buttons
--- have a nil value until their first related event
+-- Note that if not initialised manually in map.vaxes and map.vkeys,
+-- axes and keys have a nil value until their first related event
 vstate = function(v)
 	if not vmap then return end
 	
