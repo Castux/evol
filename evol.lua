@@ -406,6 +406,12 @@ treatVEvent = function(vevent,callbacks)
 	
 end
 
+
+--- Polls all virtual events and calls the associated callbacks
+-- evol.treatAllInput(map,callbacks)
+-- map: the mapping table to use (see description elsewhere)
+-- callbacks: the table of callbacks (described elsewhere)
+
 treatAllInput = function(map,cbs)
 	
 	local vevents = vInput(map)

@@ -21,7 +21,11 @@ evol.blit(image,[x,y,[dest]]) or image:blit([x,y,[dest]])
 evol.putpix(x,y,color,[image]) or image:putpix(x,y,color)
 
 **Input**
-evol.input(callbacks)
+event = evol.input()
+vevents = evol.vInput(map,[event])
+state = evol.vState(v)
+evol.treatVEvent(vevent,callbacks)
+evol.treatAllInput(map,callbacks)
 x,y,[down] = evol.mouse([button])
 down = evol.isButtonDown(button)
 down = evol.isKeyDown(key)
@@ -141,15 +145,46 @@ evol.putpix(x,y,color,[image]) or image:putpix(x,y,color)
 
 **Input**
 
-evol.input(callbacks)
-	Polls events and call the associated callback functions
+event = evol.input()
+	Polls one event and returns raw information
 
-	callbacks = {kdown, kup, mdown, mup}: table of callback functions. Each of those can be nil if not needed.
-	Event details are passed to the functions as follows:
-	kdown(key): key down event (key: the key pressed)
-	kup(key): key up event (key: the key released)
-	mdown(x,y,b): mouse button down event (x,y: mouse coordinates, b: mouse button number)
-	mup(x,y,b): mouse button up event (x,y: mouse coordinates, b: mouse button number)
+	{'kdown', keyname}
+	{'kup', keyname}
+	{'mdown',x,y,button}
+	{'mup',x,y,button}
+	{'mmotion',x,y,xrel,yrel}
+	{'axis',padnumber,axisnumer,value}
+	{'hat',padnumber,hatnumer,up,right,down,left}
+	{'bdown',padnumber,buttonnumber}
+	{'bup',padnumber,buttonnumber}
+
+vevents = evol.vInput(map,[event])
+	Polls one event, maps it to virtual buttons/axes, and returns information
+
+	map: the mapping table to use (see description elsewhere)
+	event: if present, used instead of polling new event
+	vevents is a list of virtual events
+	Returns nil if no virtual event happened
+
+state = evol.vState(v)
+	Returns the state of a virtual key/axis in the last mapping used
+
+	v: a virtual key or axis
+	state: 'down' or 'up' for a vkey, a number for an axis
+	Note that if not initialised manually in map.vaxes and map.vkeys,
+	axes and keys have a nil value until their first related event
+
+evol.treatVEvent(vevent,callbacks)
+	Call callback associated to the virtual event
+
+	vevent: a virtual event, as returned by evol.vInput()
+	callbacks: the table of callbacks (described elsewhere)
+
+evol.treatAllInput(map,callbacks)
+	Polls all virtual events and calls the associated callbacks
+
+	map: the mapping table to use (see description elsewhere)
+	callbacks: the table of callbacks (described elsewhere)
 
 x,y,[down] = evol.mouse([button])
 	Queries for mouse position and optionally the status of a button
@@ -185,9 +220,7 @@ font = evol.loadFont(path,size)
 	Loads a font
 
 	path: string containing the path to the font to load (relative to current folder, or absolute)
-	size: number of pixels high the fo--- Loads a font
-	font = evol.loadFont(path,size)
-	path: string containing the path to the font to load (relative to current folder, or absolute)nt should render in later
+	size: number of pixels high the font should render in later
 
 evol.write(font,text,x,y,[color,[image]]) or font:write(text,x,y,[color,[image]])
 	Renders text to an image
@@ -196,7 +229,7 @@ evol.write(font,text,x,y,[color,[image]]) or font:write(text,x,y,[color,[image]]
 	text: UTF-8 string to render
 	x,y: position in pixels where the top-left corner of render text should appear
 	color = {r,g,b}: color to render the text in. Defaults to black.
-	image: destination image. Defaults to screen. 
+	image: destination image. Defaults to screen. Put 'new' to get a new surface.
 
 **Graphic primitives**
 
