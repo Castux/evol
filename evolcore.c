@@ -257,7 +257,7 @@ static int l_input (lua_State *L)
 			lua_pushnumber(L, 6);
 			lua_pushnumber(L, e.jaxis.which);
 			lua_pushnumber(L, e.jaxis.axis);
-			lua_pushnumber(L, e.jaxis.value);
+			lua_pushnumber(L, e.jaxis.value/32767.0);
 			return 4;
 		case SDL_JOYHATMOTION:
 			lua_pushnumber(L, 7);

@@ -215,13 +215,15 @@ input = function()
 end
 
 --- Polls one event, maps it to virtual buttons/axes, and returns information
--- events = evol.vinput(map)
--- events is a list of events (hats and mouse can generate several at the same time)
+-- vevents = evol.vInput(map,[event])
+-- map: the mapping table to use (see description elsewhere)
+-- event: if present, used instead of polling new event
+-- vevents is a list of virtual events
 -- Returns nil if no virtual event happened
 
-vinput = function(map)
+vInput = function(map, e)
 
-	local e = input()
+	local e = e or input()
 	local vkey,dir
 	local list = {}
 	
@@ -303,16 +305,20 @@ vinput = function(map)
 			axis = map.mousex
 			val = e[2]
 			relval = e[4]		
-		
-			table.insert(list, {axis,val,relval})
+			
+			if axis then
+				table.insert(list, {axis,val,relval})
+			end
 		end
 		
 		if e[5] ~= 0 then
 			axis = map.mousey
 			val = e[3]
 			relval = e[5]		
-		
-			table.insert(list, {axis,val,relval})
+			
+			if axis then
+				table.insert(list, {axis,val,relval})
+			end
 		end
 		
 	-- gamepad axis
@@ -355,15 +361,63 @@ end
 
 
 --- Returns the state of a virtual key/axis in the last mapping used
--- state = evol.vstate(v)
+-- state = evol.vState(v)
 -- v: a virtual key or axis
 -- state: 'down' or 'up' for a vkey, a number for an axis
 -- Note that if not initialised manually in map.vaxes and map.vkeys,
 -- axes and keys have a nil value until their first related event
-vstate = function(v)
-	if not vmap then return end
+vState = function(v)
+	if not vmap or not vmap.vkeys or not vmap.vaxes then return end
 	
 	return vmap.vkeys[v] or vmap.vaxes[v]
+end
+
+--- Call callback associated to the virtual event
+-- evol.treatVEvent(vevent,callbacks)
+-- vevent: a virtual event, as returned by evol.vInput()
+-- callbacks: the table of callbacks (described elsewhere)
+
+treatVEvent = function(vevent,callbacks)
+	
+	-- vkeys
+	if #vevent == 2 and callbacks[vevent[1]] then
+		local cb = callbacks[vevent[1]]
+		
+		if type(cb) == 'function' then
+			if vevent[2] == 'down' then
+				cb()
+				return
+			end
+		
+		elseif cb then
+			
+			local cb = callbacks[vevent[1]][vevent[2]]
+			if cb then
+				cb()
+				return
+			end
+		end
+	end
+	
+	-- vaxes
+	if #vevent == 3 and callbacks[vevent[1]] then
+		callbacks[vevent[1]][vevent[2]]()
+	end
+	
+end
+
+treatAllInput = function(map,cbs)
+	
+	local vevents = vInput(map)
+	
+	while vevents do
+	
+		for i,v in ipairs(vevents) do
+			treatVEvent(v,cbs)
+		end
+		
+		vevents = vInput(map)
+	end	
 end
 
 --- Queries for mouse position and optionally the status of a button
