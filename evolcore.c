@@ -36,7 +36,7 @@ int sound_on = 1;
 int gl_on = 0;
 int curses_on = 0;
 
-int gNumpads;
+int gNumpads = 0;
 SDL_Joystick  **gPads;
 
 typedef struct{
@@ -150,8 +150,10 @@ static int l_quit (lua_State *L)
 		free(CC.fg);
 		free(CC.bg);
 	}
-	
-	Mix_CloseAudio();
+
+	if(sound_on)
+		Mix_CloseAudio();
+		
 	TTF_Quit(); 
 	
 	/* Gamepads */
