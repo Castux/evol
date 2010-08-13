@@ -161,10 +161,12 @@ event = evol.input()
 vevents = evol.vInput(map,[event])
 	Polls one event, maps it to virtual buttons/axes, and returns information
 
-	map: the mapping table to use (see description elsewhere)
+	map: the mapping table to use (see example)
 	event: if present, used instead of polling new event
-	vevents is a list of virtual events
+	vevents is a list of virtual events. A virtual event is
 	Returns nil if no virtual event happened
+	{vkey,'up'/'down'}
+	{vaxis, newval, relval}
 
 state = evol.vState(v)
 	Returns the state of a virtual key/axis in the last mapping used
@@ -178,13 +180,13 @@ evol.treatVEvent(vevent,callbacks)
 	Call callback associated to the virtual event
 
 	vevent: a virtual event, as returned by evol.vInput()
-	callbacks: the table of callbacks (described elsewhere)
+	callbacks: the table of callbacks (see example)
 
 evol.treatAllInput(map,callbacks)
 	Polls all virtual events and calls the associated callbacks
 
-	map: the mapping table to use (see description elsewhere)
-	callbacks: the table of callbacks (described elsewhere)
+	map: the mapping table to use (see example)
+	callbacks: the table of callbacks (see example)
 
 x,y,[down] = evol.mouse([button])
 	Queries for mouse position and optionally the status of a button

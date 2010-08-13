@@ -216,10 +216,13 @@ end
 
 --- Polls one event, maps it to virtual buttons/axes, and returns information
 -- vevents = evol.vInput(map,[event])
--- map: the mapping table to use (see description elsewhere)
+-- map: the mapping table to use (see example)
 -- event: if present, used instead of polling new event
--- vevents is a list of virtual events
+-- vevents is a list of virtual events. A virtual event is
 -- Returns nil if no virtual event happened
+-- {vkey,'up'/'down'}
+-- {vaxis, newval, relval}
+
 
 vInput = function(map, e)
 
@@ -375,33 +378,34 @@ end
 --- Call callback associated to the virtual event
 -- evol.treatVEvent(vevent,callbacks)
 -- vevent: a virtual event, as returned by evol.vInput()
--- callbacks: the table of callbacks (described elsewhere)
+-- callbacks: the table of callbacks (see example)
 
 treatVEvent = function(vevent,callbacks)
 	
 	-- vkeys
-	if #vevent == 2 and callbacks[vevent[1]] then
-		local cb = callbacks[vevent[1]]
+	if #vevent == 2 then
 		
-		if type(cb) == 'function' then
-			if vevent[2] == 'down' then
-				cb()
-				return
-			end
+		local cb
 		
-		elseif cb then
-			
-			local cb = callbacks[vevent[1]][vevent[2]]
-			if cb then
-				cb()
-				return
-			end
+		-- if there is a callback 'key', call it on down
+		if vevent[2] == 'down' then
+			cb = callbacks[vevent[1]]
+		
+		-- if there is a callback 'key_up', call it on up
+		else
+			cb = callbacks[vevent[1] .. '_up']
 		end
-	end
+		
+		if cb then
+			cb()
+		end
+	
 	
 	-- vaxes
-	if #vevent == 3 and callbacks[vevent[1]] then
-		callbacks[vevent[1]][vevent[2]]()
+	elseif #vevent == 3 and callbacks[vevent[1]] then
+		
+		-- call the callback, pass the newval and relval
+		callbacks[vevent[1]](vevent[2],vevent[3])
 	end
 	
 end
@@ -409,8 +413,8 @@ end
 
 --- Polls all virtual events and calls the associated callbacks
 -- evol.treatAllInput(map,callbacks)
--- map: the mapping table to use (see description elsewhere)
--- callbacks: the table of callbacks (described elsewhere)
+-- map: the mapping table to use (see example)
+-- callbacks: the table of callbacks (see example)
 
 treatAllInput = function(map,cbs)
 	

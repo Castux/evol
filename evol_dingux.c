@@ -34,11 +34,10 @@ int main(void)
 	lua_pushcfunction(L, luaopen_evolcore);
 	lua_call(L,0,0);
 
-	luaL_dostring(L,"evolcore.init = function() end");
-	luaL_dostring(L,"evol.quit = function() end");
+	luaL_dostring(L,"evolcore.init = function() end; evolcore.quit = function() end");
 	
 	if (luaL_dofile(L,"main.lua")!=0)
-		fprintf(stderr,"%s\n",lua_tostring(L,-1));
+		printf("%s\n",lua_tostring(L,-1));
 		
 	lua_close(L);
 	quit_SDL();
