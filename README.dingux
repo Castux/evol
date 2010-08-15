@@ -37,3 +37,4 @@ Note however that
 - the Dingoo doesn't have a FPU, and all Lua numbers are actually doubles. The transparent software emulation might make it rather slow.
 - there's obviously no OpenGL context creation.
 - evöL on Dingux is for now mostly a proof of concept. It hasn't been tested thoroughly. AT ALL.
+- the file Extras/dingux_keys.lua contains a table 'dingux' with the mapping between Dingoo buttons and evol keys.

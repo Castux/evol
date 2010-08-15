@@ -1,3 +1,5 @@
+-- mapping between Dingoo's buttons and evol's key values
+
 require "evol_keys"
 
 dingux = {
