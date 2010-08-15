@@ -1,0 +1,39 @@
+evöL for Dingux
+===============
+
+Dingux (the port of GNU/Linux for the Dingoo handheld device) supports SDL and the associated libraries. Furthermore, Lua is entirely in standard C, so it runs pretty much everywhere.
+
+Therefore, evöL runs on Dingux!
+
+Now for strange reasons, it does not run out of the box. The SDL initialisation and cleanup functions cannot be called from Lua. They have been moved to a C host.
+
+Building evol_dingux
+--------------------
+
+The makefile assumes you have the Dingux toolchain in /opt, modify it to reflect your own install if necessary.
+
+Note also that your toolchain might not have the development files for Lua (the headers lua.h, lualib.h, luaconf.h, lauxlib.h, and the static library liblua.a). If not, get the Lua source from www.lua.org, build it with your Dingux toolchain, and add the files either in your toolchain, or in evol's source directory.
+
+Run 'make evol_dingux' to build. It produces the binary evol_dingux, which includes the Lua intepreter and the evolcore module.
+
+Using evol_dingux
+-----------------
+
+Copy evol.lua, evol_keys.lua and evol_dingux in your game directory.
+
+Run './evol_dingux myawesomegame.lua' to run.
+
+If no filename is provided (by running './evol_dingux'), it will assume your script name is 'main.lua'.
+
+Notes
+-----
+
+The only available resolution is 320x240. The values you pass to evol.init() are fed to evol.width and evol.height but are ignored by the actual init call. So basically, always call 'evol.init(320,240)' if you don't want funny things to happen.
+
+Otherwise, the scripts should run unmodified on Dingux and on PC.
+
+Note however that
+- the Dingoo's CPU is far less powerful than a desktop PC's.
+- the Dingoo doesn't have a FPU, and all Lua numbers are actually doubles. The transparent software emulation might make it rather slow.
+- there's obviously no OpenGL context creation.
+- evöL on Dingux is for now mostly a proof of concept. It hasn't been tested thoroughly. AT ALL.

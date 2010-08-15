@@ -1,20 +1,20 @@
 evöL, a small 2D game engine in Lua
-v1.5
+v2.0
 
 What is evöL?
 -------------
 
 evöL originated as a remake of LÖVE (http://love2d.org), a great 2D game engine written in Lua, and based on SDL.
 
-LÖVE is amazing, but unfortunately, relies heavily on hardware acceleration, which makes it almost unusable on older machines, or machine without good graphic hardware (specifically, my Eee PC).
+LÖVE is amazing, but unfortunately, relies heavily on hardware acceleration, which makes it almost unusable on older machines, or machine without good graphic hardware (specifically, my EeePC).
 
-The goal of evöL is to provide an API similar to LÖVE but with internals based only on SDL surfaces. Less features are available, of course (no rotozooming or GL particule effects), but it retain the philosophy of very fast game prototyping in Lua.
+The goal of evöL is to provide an functionalities similar to LÖVE but with internals based only on SDL surfaces. Less features are available, of course (no rotozooming or GL particule effects), but it retain the philosophy of very fast game prototyping in Lua.
 
 evöL is not simply a one to one wrapper for basic SDL functions but rather a compilation of the basic things I found repeated in every SDL program I made. The motivation is to have everything done in few lines of code, to focus on the game logic rather than boring SDL settings.
 
 evöL now includes an OpenGL mode, to use along a library such as LuaGL, and a curses like terminal emulator.
 
-evöL should work on all platforms supported by SDL and Lua, including GNU/Linux, Windows, Mac OS X, etc. It has been tested on Ubuntu GNU/Linux only, but you are encouraged to report any other successful build.
+evöL should work on all platforms supported by SDL and Lua, including GNU/Linux, Windows, Mac OS X, etc. It has been tested on Ubuntu GNU/Linux and Windows only, but you are encouraged to report any other successful build.
 
 evöL is released under the GNU General Public License Version 3. See file COPYING for details.
 
@@ -42,10 +42,15 @@ Features
 
 - curses like terminal emulator
 
+  Since v2.0:
+  
+- new input system
+- Dingux port
+
 How to build?
 -------------
 
-evöL comes as two Lua modules, one written in C, the other in Lua itself. You need to build only the one in C, of course. A SConstruct file is provided, to use with the SCons build system, but you can use any other system or IDE, for instance make.
+evöL comes as two Lua modules, one written in C, the other in Lua itself. You need to build the one in C. A SConstruct file is provided, to use with the SCons build system, but you can use any other system or IDE, for instance make.
 
 To build using SCons, simply run "scons" in the source directory. It will build the evolcore.so module.
 
@@ -62,7 +67,9 @@ SDL_gfx
 How to use?
 -----------
 
-Run "sudo scons install" to install. Again you might need to modify the SConstruct to reflect your installation of Lua. You can also manually copy evolcore.so, evol.lua and evol_keys.lua to the directory of your source file, or in the Lua directory of your system.
+For a system wide install, run 'sudo scons install'. Again you might need to modify the SConstruct to reflect your installation of Lua.
+
+For a per-game use, you can also manually copy evolcore.so, evol.lua and evol_keys.lua to the directory of your source file. It is recommended to distribute evöL with you game since: 1. being a very small library, it's unlikely that your players have it already, and 2. there is no guaranty of backward compatibility whatsoever.
 
 In your Lua source code file, simply add 'require "evol"' to load the evöL modules. You should normally never have to use evolcore.so directly, but it is used by evol.lua, so its presence is required.
 
@@ -72,7 +79,7 @@ Documentation
 -------------
 
 You can find an API reference in the file API-reference.txt (automatically generated using the makedoc.lua script), and the skeleton of a basic programs you can use to start in the Examples directory. (Note that the example_gl.lua program requires LuaGL to be installed).
-You can see the names of the keys in evol_keys.lua, they are basically the SDL constants names in lower case, prefixed with "key" instead of "SDLK".
+You can see the names of the keys in evol_keys.lua, they are basically the SDL constants names in lower case, in the global 'keys' table and without the "SDLK" prefix.
 
 Feedback
 --------

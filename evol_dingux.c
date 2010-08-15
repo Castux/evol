@@ -22,9 +22,22 @@ extern int luaopen_evolcore (lua_State *L);
 void init_SDL(void);
 void quit_SDL(void);
 
-int main(void)
+int main(int argc, char **argv)
 {
 	lua_State *L;
+	char *path;
+	
+	
+	if (argc < 2)
+	{
+		path = "main.lua";
+	}
+	else
+	{
+		path = argv[1];
+	}
+	
+	printf("Using file %s\n", path);
 	
 	init_SDL();
 	
@@ -34,9 +47,10 @@ int main(void)
 	lua_pushcfunction(L, luaopen_evolcore);
 	lua_call(L,0,0);
 
-	luaL_dostring(L,"evolcore.init = function() end; evolcore.quit = function() end");
+	if (luaL_dostring(L,"evolcore.init = function() end; evolcore.quit = function() end") != 0)
+		printf("%s\n",lua_tostring(L,-1));
 	
-	if (luaL_dofile(L,"main.lua")!=0)
+	if (luaL_dofile(L, path)!=0)
 		printf("%s\n",lua_tostring(L,-1));
 		
 	lua_close(L);
