@@ -12,20 +12,15 @@ while not quit do
 	
 	dt,fps = evolcore.timer()
 	
-	evol.input {
-		function(key)
-			if key == evol.key_escape then quit = true end
-		end,
+	repeat
+		local input = evol.input()
 		
-		function(key)
-		end,
-		
-		function(x,y,b)
-		end,
-		
-		function(x,y,b)
+		if input and input[1] == 'kdown' and input[2] == 'escape' then
+			quit = true
 		end
-	}
+	until not input
+	
+	evol.curses.addch(string.char(math.random(255)),math.random(evol.nw)-1,math.random(evol.nh)-1)
 	
 	evol.curses.refresh()
 	evol.flip()

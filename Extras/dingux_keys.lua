@@ -4,21 +4,21 @@ require "evol_keys"
 
 dingux = {
 
-	up = keys.up,
-	down = keys.up,
-	left = keys.left,
-	right = keys.right,
+	up = 'up',
+	down ='down',
+	left = 'left',
+	right = 'right',
 
-	A = keys.lctrl,
-	B = keys.lalt,
-	X = keys.space,
-	Y = keys.lshift,
+	A = 'lctrl',
+	B = 'lalt',
+	X = 'space',
+	Y = 'lshift',
 
-	L = keys.tab,
-	R = keys.backspace,
+	L = 'tab',
+	R = 'backspace',
 
-	start = keys.enter,
-	select = keys.escape
+	start = 'enter',
+	select = 'escape'
 
 }
 

@@ -1,6 +1,8 @@
 require "evol"
-require "LuaGL"
-require "LuaGlu"
+
+require "luaglu"
+require "luagl"
+
 
 -- view: fourth argument is true to have OpenGL
 evol.init(800,500, false, true)

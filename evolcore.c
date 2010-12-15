@@ -921,7 +921,7 @@ static int l_curses_addch (lua_State *L)
 {
 	int x,y;
 	const char *ch;
-	char ch2;
+	unsigned char ch2;
 	
 	ch = lua_tostring(L, 1);
 	x = lua_tonumber(L, 2);
@@ -932,11 +932,11 @@ static int l_curses_addch (lua_State *L)
 	if(x < 0 || x >= CC.w || y < 0 || y >= CC.h)
 		return 0;
 	
+	ch2 = ch[0];
+	
 	/* Prevent non printables */
-	if(ch[0] <= 32 || (ch[0] >= 0x7f && ch[0] <= 0x9f))
+	if(ch2 <= 32 || (ch2 >= 0x7f && ch2 <= 0x9f))
 		ch2 = ' ';
-	else
-		ch2 = ch[0];
 	
 	CC.c[x + y*CC.w] = ch2;
 	
@@ -978,7 +978,7 @@ static int l_curses_fill (lua_State *L)
 {
 	int x,y, w,h, r,g,b, br,bg,bb;
 	const char *ch;
-	char ch2;
+	unsigned char ch2;
 	int ind,i,j;
 	
 	x = lua_tonumber(L, 1);
@@ -1006,11 +1006,11 @@ static int l_curses_fill (lua_State *L)
 			
 			if(ch)
 			{
+				ch2 = ch[0];
+				
 				/* Prevent non printables */
-				if(ch[0] <= 32 || (ch[0] >= 0x7f && ch[0] <= 0x9f))
+				if(ch2 <= 32 || (ch2 >= 0x7f && ch2 <= 0x9f))
 					ch2 = ' ';
-				else
-					ch2 = ch[0];
 				
 				CC.c[ind] = ch2;
 			}

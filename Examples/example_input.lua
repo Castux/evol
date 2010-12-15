@@ -14,13 +14,15 @@ while not quit do
 	
 	dt,fps = evol.timer()
 	
-	--[[ The most basic way: raw input
+	---[[ The most basic way: raw input
 	
-	local input = evol.input()
-	
-	if input then
-		print(unpack(input))
-	end
+	repeat
+		local input = evol.input()
+		
+		if input then
+			print(unpack(input))
+		end
+	until not input 
 	
 	--]]
 	
@@ -28,19 +30,20 @@ while not quit do
 	--		It returns a list of events, because some raw actions are mapped
 	--		to several virtual ones (especially moving the mouse).
 	
-	
-	local input = evol.vInput(map)
-	
-	if input then
-		for i,v in ipairs(input) do
-			print(unpack(v))
+	repeat
+		local input = evol.vInput(map)
+		
+		if input then
+			for i,v in ipairs(input) do
+				print(unpack(v))
+			end
 		end
-	end
-	
+	until not input
+		
 	--]]
 	
-	---[[ The complete way: give a keymap, some callbacks, and let it do it 
-	--		all for you.
+	--[[ The complete way: give a keymap, some callbacks, and let it do it 
+	--		all for you. It pulls all events it can, so no need to loop.
 	
 	evol.treatAllInput(map,cb)
 	

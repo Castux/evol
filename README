@@ -69,7 +69,7 @@ How to use?
 
 For a system wide install, run 'sudo scons install'. Again you might need to modify the SConstruct to reflect your installation of Lua.
 
-For a per-game use, you can also manually copy evolcore.so, evol.lua and evol_keys.lua to the directory of your source file. It is recommended to distribute evöL with you game since: 1. being a very small library, it's unlikely that your players have it already, and 2. there is no guaranty of backward compatibility whatsoever.
+For a per-game use, you can also manually copy evolcore.so, evol.lua and evol_keys.lua to the directory of your source file. It is recommended to distribute evöL with your game since: 1. being a very small library, it's unlikely that your players have it already, and 2. there is no guaranty of backward compatibility whatsoever.
 
 In your Lua source code file, simply add 'require "evol"' to load the evöL modules. You should normally never have to use evolcore.so directly, but it is used by evol.lua, so its presence is required.
 

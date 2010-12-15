@@ -703,7 +703,7 @@ curses.refresh = evolcore.curses_refresh
 --- Add a character at given position
 -- evol.curses.addch(char,x,y)
 -- char: a string containing the character to be printed
--- x,y: the position where to print the character, in the range (0,evol.nw), (0,evol.nh)
+-- x,y: the position where to print the character, in the range (0,evol.nw-1), (0,evol.nh-1)
 curses.addch = evolcore.curses_addch
 
 --- Set the color at given position

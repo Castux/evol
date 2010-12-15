@@ -272,6 +272,12 @@ keys.undo = 322 -- atari keyboard has undo
 
 -- reverse table, stored in the same place
 
+local tmp = {}
+
 for k,v in pairs(keys) do
-	keys[v] = k
+	tmp[v] = k
+end
+
+for k,v in pairs(tmp) do
+	keys[k] = v
 end
