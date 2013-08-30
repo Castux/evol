@@ -97,3 +97,36 @@ void evol_get_mode(evol_window_mode *mode, int *width, int *height)
 		SDL_GetWindowSize(evol_window, width, height);
 	}
 }
+
+void evol_update_timer(int fps_cap, double *dt, double *fps, double *t)
+{
+	static int frames = 0;
+	static double last_time = 0.0;
+	static double last_fps = 0.0;
+	static double last_fps_update = 0.0;
+	
+	frames++;
+	
+	float now = SDL_GetTicks() / 1000.0;
+	float delta = now - last_time;
+
+	if(fps_cap && delta < 1.0 / fps_cap)
+	{
+		SDL_Delay( (1.0 / fps_cap - delta) * 1000);
+	}
+
+	now = SDL_GetTicks() / 1000.0;
+
+	if(now - last_fps_update > 1.0)
+	{
+		last_fps = frames / (now - last_fps_update);
+		last_fps_update = now;
+		frames = 0;
+	}
+
+	*dt = now - last_time;
+	*fps = last_fps;
+	*t = now;
+
+	last_time = now;	
+}

@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <math.h>
 
 #include "evol.h"
 
@@ -14,19 +15,25 @@ int main(void)
 	evol_get_mode(&mode,&w,&h);
 	printf("Mode: %d, %dx%d\n", mode, w, h);
 
-	/*
+	
 	while (1)
 	{
-		SDL_Event e;
-		if (SDL_PollEvent(&e))
+		double dt,fps,t;
+		evol_update_timer(60, &dt, &fps, &t);
+		printf("%.10f,%.10f,%.10f\n",dt,fps,t);
+
+		if(t > 10.0)
 		{
-			if (e.type == SDL_QUIT)
-			{
-				break;
-			}
+			break;
+		}
+
+		float f;
+		int i;
+		for(i = 0 ; i < 1000000 ; i++)
+		{
+			f = sqrt(i*200.0);
 		}
 	}
-	*/
 
 	evol_quit();
 }
