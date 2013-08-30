@@ -1,0 +1,45 @@
+evol 2.0
+========
+
+With the advent of SDL 2, evol needs an overhaul. With evol 2.0 we want to take advantage of the SDL 2's new or improved features:
+
+- cross platform: Linux, Mac OS X, Windows, and Ouya
+- keyboard/mouse and gamepad input
+- hardware accelerated 2D graphics (images, primitives, text)
+- better unicode support
+
+We still want evol to be a minimal wrapper around low level stuff, with all the more advanced "engine" done in higher level languages. To that extent, evol 2.0 should present a C interface, and an independent Lua wrapper. That way it could be used in C++, D, or whatever else.
+
+We also decide to drop the "open OpenGL context" thing and the emulated curses from previous verions, are they become irrelevant (OpenGL is not trivially portable to Ouya, which uses GLES, and fake curses can be done at higher level).
+
+evol is still built as a Lua module, that can be loaded from the standard 5.1 interpreter, but provides a minimal loader if you need to compile it yourself.
+
+Video
+=====
+
+We assume that we'll always have a single non resizable window.
+
+evol.init()
+evol.quit()
+init also builds a default window
+
+
+w,h = evol.get_native_size()
+(if you need to know before you decide of a mode. This gives the size of the display where the window is currently.)
+
+evol.set_mode([mode,[w,h]])
+mode: "windowed","fullscreen". Full screen is the new "desktop fullscreen" that does not switch the native size
+w,h: size, optional. If not provided, a reasonable size is chosen (highest available mode in fullscreen, second highest in windowed). If provided in windowed, you get the required size, and in fullscreen you get a "virtual" screen fitted to native fullscreen size.
+
+mode,w,h = evol.get_mode()
+in windowed mode, simply the window size. In fullscreen mode, returns the virtual size (if it's set), or the native size (if virtual hasn't been set).
+
+evol.set_scaling_quality(quality)
+quality: "nearest", "linear"
+
+evol.width
+evol.height
+The drawable size (either the actual window size, or the fullscreen size, or the virtual screen size)
+
+dt,fps,t = evol.start_frame([fpsmax])
+(unchanged)
