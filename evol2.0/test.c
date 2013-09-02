@@ -38,6 +38,8 @@ int main(void)
 
 		evol_draw_image(image, 20, 10);
 
+		evol_draw_image2(image, 200, 150, 2, 2, 0, 0, t / 5 * 360);
+
 		evol_update_screen();
 
 		if(t > 6.0)

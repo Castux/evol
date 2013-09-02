@@ -24,3 +24,4 @@ evol_image evol_load_image(const char *path);
 void evol_free_image(evol_image image);
 void evol_get_image_size(evol_image image, int *width, int *height);
 void evol_draw_image(evol_image image, int x, int y);
+void evol_draw_image2(evol_image image, int x, int y, double scale_x, double scale_y, int pivot_x, int pivot_y, double angle);

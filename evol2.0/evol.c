@@ -200,11 +200,27 @@ void evol_draw_image(evol_image image, int x, int y)
 	dst_rect.x = x;
 	dst_rect.y = y;
 
-	int w,h;
-	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-
-	dst_rect.w = w;
-	dst_rect.h = h;
+	SDL_QueryTexture(texture, NULL, NULL, &dst_rect.w, &dst_rect.h);
 
 	SDL_RenderCopy(evol_renderer, texture, NULL, &dst_rect);
+}
+
+void evol_draw_image2(evol_image image, int x, int y, double scale_x, double scale_y, int pivot_x, int pivot_y, double angle)
+{
+	SDL_Texture *texture = (SDL_Texture *) image;
+
+	SDL_Point center;
+	center.x = pivot_x * scale_x;
+	center.y = pivot_y * scale_y;
+
+	SDL_Rect dst_rect;
+	dst_rect.x = x - center.x;
+	dst_rect.y = y - center.y;
+
+	SDL_QueryTexture(texture, NULL, NULL, &dst_rect.w, &dst_rect.h);
+
+	dst_rect.w *= scale_x;
+	dst_rect.h *= scale_y;
+
+	SDL_RenderCopyEx(evol_renderer, texture, NULL, &dst_rect, angle, &center, 0);
 }

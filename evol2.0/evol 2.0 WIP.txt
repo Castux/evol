@@ -51,6 +51,7 @@ image: an opaque userdata with a texture loaded from an image
 
 evol.draw_image(image,x,y)
 evol.draw_image(image,x,y,scale_x,scale_y,pivot_x,pivot_y,angle)
+Image's pivot is given in the original image's coordinates. That is: rotation and scaling is applied around pivot, and the pivot always ends up in the given (x,y) coordinates. Scaling can be negative. Angle in degrees, clockwise positive (y axis does down).
 
 Display tree
 ============
