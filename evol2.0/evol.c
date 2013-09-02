@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "SDL2/SDL.h"
+#include "SDL2_image/SDL_image.h"
 
 #include "evol.h"
 
@@ -26,27 +27,28 @@ void evol_init()
 		evol_error("could not initialize SDL");
 	}
 
-	/* Create default window (800x600 windowed) and renderer */
+	/* Init window and renderer */
 
-	err = SDL_CreateWindowAndRenderer(800, 600, 0, &evol_window, &evol_renderer);
-	if(err != 0)
-	{
-		evol_error("could not create window");
-	}
+	evol_window = NULL;
+	evol_renderer = NULL;
+
+	/* SDL_image */
+
+	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF);
 }
 
 void evol_quit()
 {
+	SDL_DestroyRenderer(evol_renderer);
+	SDL_DestroyWindow(evol_window);
+
+	IMG_Quit();
 	SDL_Quit();
 }
 
 void evol_get_native_size(int *w, int *h)
 {
-	int display = SDL_GetWindowDisplayIndex(evol_window);
-	if(display < 0)
-	{
-		evol_error("could not get native size");
-	}
+	int display = evol_window ? SDL_GetWindowDisplayIndex(evol_window) : 0;
 
 	SDL_DisplayMode mode;
 	int err = SDL_GetDesktopDisplayMode(display, &mode);
@@ -61,27 +63,49 @@ void evol_get_native_size(int *w, int *h)
 
 void evol_set_mode(evol_window_mode mode, int width, int height)
 {
-	int err = SDL_SetWindowFullscreen(evol_window, mode == evol_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-	if(err != 0)
-	{
-		evol_error("could not switch to fullscreen");
-	}
+	int err;
 
-	if(mode == evol_fullscreen)
+	if(!evol_window)
 	{
-		if(width > 0 && height > 0)
+		err = SDL_CreateWindowAndRenderer(width, height,
+			mode == evol_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0,
+			&evol_window, &evol_renderer);
+
+		if(err != 0)
 		{
-			SDL_RenderSetLogicalSize(evol_renderer, width, height);
+			evol_error("could not create window");
 		}
 	}
 	else
 	{
-		SDL_SetWindowSize(evol_window, width, height);
+		err = SDL_SetWindowFullscreen(evol_window, mode == evol_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+		if(err != 0)
+		{
+			evol_error("could not switch to fullscreen");
+		}
+
+		if(mode == evol_fullscreen)
+		{
+			if(width > 0 && height > 0)
+			{
+				SDL_RenderSetLogicalSize(evol_renderer, width, height);
+			}
+		}
+		else
+		{
+			SDL_SetWindowSize(evol_window, width, height);
+		}
 	}
 }
 
 void evol_get_mode(evol_window_mode *mode, int *width, int *height)
 {
+	if(!evol_window)
+	{
+		*width = 0;
+		*height = 0;
+	}
+
 	*mode = (SDL_GetWindowFlags(evol_window) & SDL_WINDOW_FULLSCREEN_DESKTOP) ? evol_fullscreen : evol_windowed;
 
 	int logical_w, logical_h;
@@ -129,4 +153,58 @@ void evol_update_timer(int fps_cap, double *dt, double *fps, double *t)
 	*t = now;
 
 	last_time = now;	
+}
+
+void evol_show_cursor(int toggle)
+{
+	SDL_ShowCursor(toggle == 0 ? SDL_DISABLE : SDL_ENABLE);
+}
+
+void evol_clear_screen(unsigned char r, unsigned char g, unsigned char b)
+{
+	SDL_SetRenderDrawColor(evol_renderer, r, g, b, 255);
+	SDL_RenderClear(evol_renderer);
+}
+
+void evol_update_screen()
+{
+	SDL_RenderPresent(evol_renderer);
+}
+
+/* Graphics */
+
+evol_image evol_load_image(const char *path)
+{
+	SDL_Surface *surface = IMG_Load(path);
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(evol_renderer, surface);
+	SDL_FreeSurface(surface);
+
+	return (evol_image) texture;
+}
+
+void evol_free_image(evol_image image)
+{
+	SDL_DestroyTexture((SDL_Texture *) image);
+}
+
+void evol_get_image_size(evol_image image, int *width, int *height)
+{
+	SDL_QueryTexture((SDL_Texture *) image, NULL, NULL, width, height);
+}
+
+void evol_draw_image(evol_image image, int x, int y)
+{
+	SDL_Texture *texture = (SDL_Texture *) image;
+
+	SDL_Rect dst_rect;
+	dst_rect.x = x;
+	dst_rect.y = y;
+
+	int w,h;
+	SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+
+	dst_rect.w = w;
+	dst_rect.h = h;
+
+	SDL_RenderCopy(evol_renderer, texture, NULL, &dst_rect);
 }

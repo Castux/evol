@@ -14,26 +14,38 @@ int main(void)
 
 	evol_get_mode(&mode,&w,&h);
 	printf("Mode: %d, %dx%d\n", mode, w, h);
+	evol_get_native_size(&w,&h);
+	printf("Native: %dx%d\n", w, h);
 
+	evol_show_cursor(0);
 	
+	evol_image image = evol_load_image("buy.png");
+	if(image == NULL)
+	{
+		printf("No texture :/\n");
+	}
+
+	evol_get_image_size(image, &w, &h);
+	printf("Image: %dx%d\n", w, h);
+
+	int done = 0;
 	while (1)
 	{
 		double dt,fps,t;
-		evol_update_timer(60, &dt, &fps, &t);
-		printf("%.10f,%.10f,%.10f\n",dt,fps,t);
+		evol_update_timer(30, &dt, &fps, &t);
+		
+		evol_clear_screen(220,40,100);
 
-		if(t > 10.0)
+		evol_draw_image(image, 20, 10);
+
+		evol_update_screen();
+
+		if(t > 6.0)
 		{
 			break;
 		}
-
-		float f;
-		int i;
-		for(i = 0 ; i < 1000000 ; i++)
-		{
-			f = sqrt(i*200.0);
-		}
 	}
 
+	evol_free_image(image);
 	evol_quit();
 }

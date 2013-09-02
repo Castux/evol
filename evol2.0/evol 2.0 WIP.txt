@@ -21,25 +21,57 @@ We assume that we'll always have a single non resizable window.
 
 evol.init()
 evol.quit()
-init also builds a default window
-
 
 w,h = evol.get_native_size()
 (if you need to know before you decide of a mode. This gives the size of the display where the window is currently.)
 
 evol.set_mode([mode,[w,h]])
 mode: "windowed","fullscreen". Full screen is the new "desktop fullscreen" that does not switch the native size
-w,h: size, optional. If not provided, a reasonable size is chosen (highest available mode in fullscreen, second highest in windowed). If provided in windowed, you get the required size, and in fullscreen you get a "virtual" screen fitted to native fullscreen size.
+w,h: size, optional (0x0 in C for optional). If not provided, a reasonable size is chosen (highest available mode in fullscreen, second highest in windowed). If provided in windowed, you get the required size, and in fullscreen you get a "virtual" screen fitted to native fullscreen size.
 
 mode,w,h = evol.get_mode()
+evol.width
+evol.height
 in windowed mode, simply the window size. In fullscreen mode, returns the virtual size (if it's set), or the native size (if virtual hasn't been set).
 
 evol.set_scaling_quality(quality)
 quality: "nearest", "linear"
 
-evol.width
-evol.height
-The drawable size (either the actual window size, or the fullscreen size, or the virtual screen size)
+dt,fps,t = evol.update_timer([fpsmax])
+(unchanged, but now all in seconds)
 
-dt,fps,t = evol.start_frame([fpsmax])
-(unchanged)
+evol.update_screen()
+
+Graphics
+========
+
+image = evol.load_image(path)
+evol.free_image(image)
+image: an opaque userdata with a texture loaded from an image
+
+evol.draw_image(image,x,y)
+evol.draw_image(image,x,y,scale_x,scale_y,pivot_x,pivot_y,angle)
+
+Display tree
+============
+
+All in Lua, a function evol.update_transform_tree(t) takes a node, computes tranforms, and draws whatever it finds:
+
+node = {
+	scale = 1,		-- if present, applies to current transform
+	angle = 0,		-- if present, applies to current transform
+	x = 0,			-- etc.
+	y = 0,			-- etc.
+
+	visible = true,
+
+	children = {}	-- if present, calls recursively on them
+	children_lists = {}		-- calls recursively on the content of these lists
+
+	scale_x = 1,	-- anisotropic scaling (applied only to this node's texture and/or vector graphics)
+	scale_y = 1,	-- etc.
+	texture = Texture() -- if present, draw texture at current tranform
+	graphics = Graphics()	-- if present, draws vector graphics at current transform
+}
+
+On the way, it fills in global_scale, global_angle, global_x and global_y for each node. For optimization (later), maybe a no_update flag
