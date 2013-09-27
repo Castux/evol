@@ -160,7 +160,7 @@ void evol_show_cursor(int toggle)
 	SDL_ShowCursor(toggle == 0 ? SDL_DISABLE : SDL_ENABLE);
 }
 
-void evol_clear_screen(unsigned char r, unsigned char g, unsigned char b)
+void evol_clear_screen(byte r, byte g, byte b)
 {
 	SDL_SetRenderDrawColor(evol_renderer, r, g, b, 255);
 	SDL_RenderClear(evol_renderer);
@@ -190,6 +190,12 @@ void evol_free_image(evol_image image)
 void evol_get_image_size(evol_image image, int *width, int *height)
 {
 	SDL_QueryTexture((SDL_Texture *) image, NULL, NULL, width, height);
+}
+
+void evol_set_image_modulation(evol_image image, byte r, byte g, byte b, byte a)
+{
+	SDL_SetTextureColorMod((SDL_Texture *) image, r, g, b);
+	SDL_SetTextureAlphaMod((SDL_Texture *) image, a);
 }
 
 void evol_draw_image(evol_image image, int x, int y)
@@ -223,4 +229,140 @@ void evol_draw_image2(evol_image image, int x, int y, double scale_x, double sca
 	dst_rect.h *= scale_y;
 
 	SDL_RenderCopyEx(evol_renderer, texture, NULL, &dst_rect, angle, &center, 0);
+}
+
+int evol_input(evol_event *event)
+{
+	SDL_Event e;
+	SDL_PollEvent(&e);
+	
+	switch(e.type)
+	{
+		/* keyboard */
+
+		case SDL_KEYDOWN:
+			
+			event->type = evol_button_event;
+			event->device = evol_keyboard;
+			event->elem_num = e.key.keysym.sym;
+			event->state = evol_down;
+			
+			return 1;
+
+		case SDL_KEYUP:
+			
+			event->type = evol_button_event;
+			event->device = evol_keyboard;
+			event->elem_num = e.key.keysym.sym;
+			event->state = evol_up;
+			
+			return 1;
+
+		/* mouse */
+
+		case SDL_MOUSEBUTTONDOWN:
+
+			event->type = evol_button_event;
+			event->device = evol_mouse;
+			event->elem_num = e.button.button;
+			event->state = evol_down;
+
+			return 1;
+
+		case SDL_MOUSEBUTTONUP:
+
+			event->type = evol_button_event;
+			event->device = evol_mouse;
+			event->elem_num = e.button.button;
+			event->state = evol_up;
+			
+			return 1;
+
+		case SDL_MOUSEMOTION:
+			
+			event->type = evol_axis_event;
+			event->device = evol_mouse;
+			event->x = e.motion.x;
+			event->y = e.motion.y;
+			
+			return 1;
+
+		/* gamepad */
+
+		case SDL_CONTROLLERBUTTONDOWN:
+			
+			event->type = evol_button_event;
+			event->device = evol_gamepad;
+			event->device_num = e.cbutton.which;
+			event->elem_num = e.cbutton.button;
+			event->state = evol_down;
+
+			return 1;
+
+		case SDL_CONTROLLERBUTTONUP:
+			
+			event->type = evol_button_event;
+			event->device = evol_gamepad;
+			event->device_num = e.cbutton.which;
+			event->elem_num = e.cbutton.button;
+			event->state = evol_up;
+
+			return 1;
+
+		case SDL_CONTROLLERAXISMOTION:
+			
+			event->type = evol_axis_event;
+			event->device = evol_gamepad;
+			event->device_num = e.caxis.which;
+
+			switch(e.caxis.axis)
+			{
+				case SDL_CONTROLLER_AXIS_LEFTX:
+					event->elem_num = evol_left_stick;
+					event->x = e.caxis.value;
+					event->y = 0;
+					break;
+				case SDL_CONTROLLER_AXIS_LEFTY:
+					event->elem_num = evol_left_stick;
+					event->x = 0;
+					event->y = e.caxis.value;
+					break;
+				case SDL_CONTROLLER_AXIS_RIGHTX:
+					event->elem_num = evol_right_stick;
+					event->x = e.caxis.value;
+					event->y = 0;
+					break;
+				case SDL_CONTROLLER_AXIS_RIGHTY:
+					event->elem_num = evol_right_stick;
+					event->x = 0;
+					event->y = e.caxis.value;
+					break;
+				case SDL_CONTROLLER_AXIS_TRIGGERLEFT:
+					event->elem_num = evol_triggers;
+					event->x = e.caxis.value;
+					event->y = 0;
+					break;
+				case SDL_CONTROLLER_AXIS_TRIGGERRIGHT:
+					event->elem_num = evol_triggers;
+					event->x = 0;
+					event->y = e.caxis.value;
+					break;
+			}
+			
+			return 1;
+
+		/* system */
+
+		case SDL_QUIT:
+
+			event->type = evol_quit_event;
+
+			return 1;
+
+		default:
+
+			return 0;
+	}
+
+	return 0;
 }
