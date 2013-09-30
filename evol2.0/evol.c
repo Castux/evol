@@ -246,7 +246,7 @@ int evol_input(evol_event *event)
 			event->device = evol_keyboard;
 			event->elem_num = e.key.keysym.sym;
 			event->state = evol_down;
-			
+
 			return 1;
 
 		case SDL_KEYUP:
@@ -282,9 +282,20 @@ int evol_input(evol_event *event)
 			
 			event->type = evol_axis_event;
 			event->device = evol_mouse;
+			event->elem_num = evol_mouse_motion;
 			event->x = e.motion.x;
 			event->y = e.motion.y;
 			
+			return 1;
+
+		case SDL_MOUSEWHEEL:
+
+			event->type = evol_axis_event;
+			event->device = evol_mouse;
+			event->elem_num = evol_mouse_wheel;
+			event->x = e.wheel.x;
+			event->y = e.wheel.y;
+
 			return 1;
 
 		/* gamepad */
@@ -365,4 +376,9 @@ int evol_input(evol_event *event)
 	}
 
 	return 0;
+}
+
+const char* evol_get_key_name(int key)
+{
+	return SDL_GetKeyName(key);
 }

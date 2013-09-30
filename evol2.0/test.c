@@ -39,8 +39,13 @@ int main(void)
 		evol_event e;
 		if(evol_input(&e))
 		{
-			printf("Event: %d, %d, %d, %d, %d, %d, %d\n", e.type, e.device, e.device_num,
+			printf("Event: %d, %d, %d, %d, %d, %d, %d\n", e.device, e.device, e.device_num,
 				e.elem_num, e.state, e.x, e.y);
+
+			if(e.device == evol_keyboard)
+			{
+				printf("Key: %s\n", evol_get_key_name(e.elem_num));
+			}
 
 			if(e.type == evol_quit_event)
 			{
@@ -72,7 +77,7 @@ int main(void)
 			}
 		}
 
-		evol_update_screen();
+		//evol_update_screen();
 	}
 
 	evol_free_image(image);

@@ -53,6 +53,12 @@ typedef enum
 
 typedef enum
 {
+	evol_mouse_motion,
+	evol_mouse_wheel
+} evol_mouse_axis;
+
+typedef enum
+{
 	evol_left_stick,
 	evol_right_stick,
 	evol_triggers
@@ -60,8 +66,8 @@ typedef enum
 
 typedef struct
 {
-	evol_event_type		type;
 	evol_device			device;
+	evol_event_type		type;
 	int					device_num;
 	int					elem_num;
 	evol_button_state	state;		// used for buttons
@@ -70,3 +76,4 @@ typedef struct
 } evol_event;
 
 int evol_input(evol_event *event);
+const char* evol_get_key_name(int key);
