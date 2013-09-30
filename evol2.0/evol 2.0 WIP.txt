@@ -25,7 +25,7 @@ evol.quit()
 w,h = evol.get_native_size()
 (if you need to know before you decide of a mode. This gives the size of the display where the window is currently.)
 
-evol.set_mode([mode,[w,h]])
+evol.set_mode(mode,[w,h])
 mode: "windowed","fullscreen". Full screen is the new "desktop fullscreen" that does not switch the native size
 w,h: size, optional (0x0 in C for optional). If not provided, a reasonable size is chosen (highest available mode in fullscreen, second highest in windowed). If provided in windowed, you get the required size, and in fullscreen you get a "virtual" screen fitted to native fullscreen size.
 

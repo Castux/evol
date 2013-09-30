@@ -76,25 +76,23 @@ void evol_set_mode(evol_window_mode mode, int width, int height)
 			evol_error("could not create window");
 		}
 	}
+	
+	err = SDL_SetWindowFullscreen(evol_window, mode == evol_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
+	if(err != 0)
+	{
+		evol_error("could not switch to fullscreen");
+	}
+
+	if(mode == evol_fullscreen)
+	{
+		if(width > 0 && height > 0)
+		{
+			SDL_RenderSetLogicalSize(evol_renderer, width, height);
+		}
+	}
 	else
 	{
-		err = SDL_SetWindowFullscreen(evol_window, mode == evol_fullscreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0);
-		if(err != 0)
-		{
-			evol_error("could not switch to fullscreen");
-		}
-
-		if(mode == evol_fullscreen)
-		{
-			if(width > 0 && height > 0)
-			{
-				SDL_RenderSetLogicalSize(evol_renderer, width, height);
-			}
-		}
-		else
-		{
-			SDL_SetWindowSize(evol_window, width, height);
-		}
+		SDL_SetWindowSize(evol_window, width, height);
 	}
 }
 
