@@ -33,33 +33,34 @@ void evol_draw_image2(evol_image image, int x, int y, double scale_x, double sca
 
 typedef enum
 {
-	evol_button_event,
+	evol_mouse = 0,
+	evol_keyboard,
+	evol_gamepad,
+	evol_system
+} evol_device;
+
+typedef enum
+{
+	evol_button_event = 0,
 	evol_axis_event,
 	evol_quit_event
 } evol_event_type;
 
 typedef enum
 {
-	evol_mouse,
-	evol_keyboard,
-	evol_gamepad
-} evol_device;
-
-typedef enum
-{
-	evol_up,
+	evol_up = 0,
 	evol_down
 } evol_button_state;
 
 typedef enum
 {
-	evol_mouse_motion,
+	evol_mouse_motion = 0,
 	evol_mouse_wheel
 } evol_mouse_axis;
 
 typedef enum
 {
-	evol_left_stick,
+	evol_left_stick = 0,
 	evol_right_stick,
 	evol_triggers
 } evol_gamepad_axis;

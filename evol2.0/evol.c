@@ -174,6 +174,12 @@ void evol_update_screen()
 evol_image evol_load_image(const char *path)
 {
 	SDL_Surface *surface = IMG_Load(path);
+
+	if(surface == NULL)
+	{
+		evol_error("could not load image");
+	}
+
 	SDL_Texture *texture = SDL_CreateTextureFromSurface(evol_renderer, surface);
 	SDL_FreeSurface(surface);
 
@@ -364,6 +370,7 @@ int evol_input(evol_event *event)
 
 		case SDL_QUIT:
 
+			event->device = evol_system;
 			event->type = evol_quit_event;
 
 			return 1;

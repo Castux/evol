@@ -26,8 +26,8 @@ static int l_get_native_size(lua_State *L)
 
 	evol_get_native_size(&w, &h);
 
-	lua_pushnumber(L, w);
-	lua_pushnumber(L, h);
+	lua_pushinteger(L, w);
+	lua_pushinteger(L, h);
 
 	return 2;
 }
@@ -74,8 +74,8 @@ static int l_get_mode(lua_State *L)
 			break;
 	}
 
-	lua_pushnumber(L, w);
-	lua_pushnumber(L, h);
+	lua_pushinteger(L, w);
+	lua_pushinteger(L, h);
 
 	return 3;
 }
@@ -121,6 +121,129 @@ static int l_update_screen(lua_State *L)
 	return 0;
 }
 
+static int l_load_image(lua_State *L)
+{
+	const char *path = luaL_checkstring(L, 1);
+
+	evol_image image = evol_load_image(path);
+
+	lua_pushlightuserdata(L, image);
+
+	return 1;
+}
+
+static evol_image check_image(lua_State *L)
+{
+	evol_image image = (evol_image) lua_touserdata(L, 1);
+
+	if(!image)
+	{
+		luaL_error(L, "invalid image\n");
+	}
+
+	return image;
+}
+
+static int l_free_image(lua_State *L)
+{
+	evol_image image = check_image(L);
+
+	evol_free_image(image);
+
+	return 0;
+}
+
+static int l_get_image_size(lua_State *L)
+{
+	evol_image image = check_image(L);
+	int w,h;
+
+	evol_get_image_size(image, &w, &h);
+
+	lua_pushinteger(L, w);
+	lua_pushinteger(L, h);
+
+	return 2;
+}
+
+static int l_set_image_modulation(lua_State *L)
+{
+	evol_image image = check_image(L);
+	
+	int r = luaL_optint(L, 2, 255);
+	int g = luaL_optint(L, 3, 255);
+	int b = luaL_optint(L, 4, 255);
+	int a = luaL_optint(L, 5, 255);
+
+	evol_set_image_modulation(image, r, g, b, a);
+
+	return 0;
+}
+
+static int l_draw_image(lua_State *L)
+{
+	evol_image image = check_image(L);
+	
+	int x = luaL_checkint(L, 2);
+	int y = luaL_checkint(L, 3);
+
+	if(lua_gettop(L) > 3)
+	{
+		double scale_x = luaL_optnumber(L, 4, 1.0);
+		double scale_y = luaL_optnumber(L, 5, 1.0);
+
+		int pivot_x = luaL_optint(L, 6, 0);
+		int pivot_y = luaL_optint(L, 7, 0);
+
+		double angle = luaL_optnumber(L, 8, 0.0);
+
+		evol_draw_image2(image, x, y, scale_x, scale_y, pivot_x, pivot_y, angle);
+	}
+	else
+	{
+		evol_draw_image(image, x, y);
+	}
+
+	return 0;
+}
+
+static const char *devices[] =
+{
+	"mouse",
+	"keyboard",
+	"gamepad",
+	"system"
+};
+
+static int l_input(lua_State *L)
+{
+	evol_event e;
+
+	if(evol_input(&e))
+	{
+		if(!lua_istable(L, 1) || lua_gettop(L) != 1)
+		{
+			luaL_error(L, "expected exactly one table argument");
+		}
+		
+		//printf("Dev : %d, %s\n", e.device, devices[e.device]);
+		
+		//lua_pushstring(L, devices[e.device]);
+
+		lua_newtable(L);
+
+		lua_pushstring(L, "device");
+		lua_pushnumber(L, 200);
+
+		printf("is table %d\n", lua_istable(L, -3));
+		lua_settable(L, -3);
+
+		return 1;
+	}
+	
+	return 0;
+}
+
 /* Module opening */
 
 static const struct luaL_reg R[] =
@@ -134,6 +257,14 @@ static const struct luaL_reg R[] =
 	{"show_cursor", l_show_cursor},
 	{"clear_screen", l_clear_screen},
 	{"update_screen", l_update_screen},
+
+	{"load_image", l_load_image},
+	{"free_image", l_free_image},
+	{"get_image_size", l_get_image_size},
+	{"set_image_modulation", l_set_image_modulation},
+	{"draw_image", l_draw_image},
+
+	{"input", l_input},
 	
 	{NULL, NULL}
 };
