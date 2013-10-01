@@ -3,7 +3,7 @@ LUA_DIR=lua
 PLAT= 
 EVOL_LIBS= 
 
-SRC= evol.c evol_lua.c main.c
+SRC= evol.c evol_lua.c evol_main.c
 CFLAGS= $(shell sdl2-config --cflags) -I $(LUA_DIR)/src
 
 PLATFORMS= macosx linux

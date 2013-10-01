@@ -254,16 +254,6 @@ static const char *mouse_axes[] =
 	"wheel"
 };
 
-static const char *mouse_buttons[] =
-{
-	NULL,
-	"left",
-	"middle",
-	"right",
-	"X1",
-	"X2"
-};
-
 static int l_input(lua_State *L)
 {
 	evol_event e;
@@ -310,7 +300,7 @@ static int l_input(lua_State *L)
 				lua_setfield(L, -2, "axis");
 				break;
 			case evol_button_event:
-				lua_pushstring(L, mouse_buttons[e.elem_num]);
+				lua_pushinteger(L, e.elem_num);
 				lua_setfield(L, -2, "button");
 				break;
 		}
