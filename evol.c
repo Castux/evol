@@ -387,6 +387,9 @@ int evol_input(evol_event *event)
 					break;
 			}
 			
+			event->x /= 32767.0;
+			event->y /= 32767.0;
+
 			return 1;
 
 		/* system */

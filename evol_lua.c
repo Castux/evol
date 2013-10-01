@@ -323,9 +323,9 @@ static int l_input(lua_State *L)
 
 	if(e.type == evol_axis_event)
 	{
-		lua_pushinteger(L, e.x);
+		lua_pushnumber(L, e.x);
 		lua_setfield(L, -2, "x");
-		lua_pushinteger(L, e.y);
+		lua_pushnumber(L, e.y);
 		lua_setfield(L, -2, "y");
 	}
 	else if(e.type == evol_button_event)

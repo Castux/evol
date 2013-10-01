@@ -72,8 +72,8 @@ typedef struct
 	int					device_num;
 	int					elem_num;
 	evol_button_state	state;		// used for buttons
-	int					x;			// used for axes
-	int					y;
+	double				x;			// used for axes
+	double				y;
 } evol_event;
 
 int evol_input(evol_event *event);
