@@ -207,7 +207,7 @@ static int l_draw_image(lua_State *L)
 	return 0;
 }
 
-static const char *devices[] =
+static const char *event_devices[] =
 {
 	"mouse",
 	"keyboard",
@@ -215,33 +215,126 @@ static const char *devices[] =
 	"system"
 };
 
+static const char *event_types[] =
+{
+	"button",
+	"axis",
+	"quit"
+};
+
+static const char *gamepad_axes[] =
+{
+	"left",
+	"right",
+	"triggers"
+};
+
+static const char *gamepad_buttons[] =
+{
+	"A",
+	"B",
+	"X",
+	"Y",
+	"back",
+	"guide",
+	"start",
+	"left stick",
+	"right stick",
+	"left shoulder",
+	"right shoulder",
+	"up",
+	"down",
+	"left",
+	"right"
+};
+
+static const char *mouse_axes[] =
+{
+	"motion",
+	"wheel"
+};
+
+static const char *mouse_buttons[] =
+{
+	NULL,
+	"left",
+	"middle",
+	"right",
+	"X1",
+	"X2"
+};
+
 static int l_input(lua_State *L)
 {
 	evol_event e;
 
-	if(evol_input(&e))
+	if(!evol_input(&e))
 	{
-		if(!lua_istable(L, 1) || lua_gettop(L) != 1)
-		{
-			luaL_error(L, "expected exactly one table argument");
-		}
-		
-		//printf("Dev : %d, %s\n", e.device, devices[e.device]);
-		
-		//lua_pushstring(L, devices[e.device]);
-
-		lua_newtable(L);
-
-		lua_pushstring(L, "device");
-		lua_pushnumber(L, 200);
-
-		printf("is table %d\n", lua_istable(L, -3));
-		lua_settable(L, -3);
-
-		return 1;
+		return 0;
 	}
-	
-	return 0;
+
+	if(!lua_istable(L, 1))
+	{
+		lua_newtable(L);
+	}
+
+	lua_pushstring(L, event_devices[e.device]);
+	lua_setfield(L, -2, "device");
+
+	lua_pushstring(L, event_types[e.type]);
+	lua_setfield(L, -2, "type");
+
+	if(e.device == evol_gamepad)
+	{
+		lua_pushinteger(L, e.device_num);
+		lua_setfield(L, -2, "device_num");
+
+		switch(e.type)
+		{
+			case evol_axis_event:
+				lua_pushstring(L, gamepad_axes[e.elem_num]);
+				lua_setfield(L, -2, "axis");
+				break;
+			case evol_button_event:
+				lua_pushstring(L, gamepad_buttons[e.elem_num]);
+				lua_setfield(L, -2, "button");
+				break;
+		}
+	}
+	else if(e.device == evol_mouse)
+	{
+		switch(e.type)
+		{
+			case evol_axis_event:
+				lua_pushstring(L, mouse_axes[e.elem_num]);
+				lua_setfield(L, -2, "axis");
+				break;
+			case evol_button_event:
+				lua_pushstring(L, mouse_buttons[e.elem_num]);
+				lua_setfield(L, -2, "button");
+				break;
+		}
+	}
+	else if(e.device == evol_keyboard)
+	{
+		lua_pushstring(L, evol_get_key_name(e.elem_num));
+		lua_setfield(L, -2, "key");
+	}
+
+	if(e.type == evol_axis_event)
+	{
+		lua_pushinteger(L, e.x);
+		lua_setfield(L, -2, "x");
+		lua_pushinteger(L, e.y);
+		lua_setfield(L, -2, "y");
+	}
+	else if(e.type == evol_button_event)
+	{
+		lua_pushstring(L, e.state == evol_up ? "up" : "down");
+		lua_setfield(L, -2, "state");
+	}
+
+	return 1;
 }
 
 /* Module opening */

@@ -35,6 +35,17 @@ void evol_init()
 	/* SDL_image */
 
 	IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG | IMG_INIT_TIF);
+
+	/* Open gamepads */
+
+	int i;
+	for(i = 0 ; i < SDL_NumJoysticks() ; i++)
+	{
+		if(SDL_IsGameController(i))
+		{
+			SDL_GameControllerOpen(i);
+		}
+	}
 }
 
 void evol_quit()
@@ -374,6 +385,13 @@ int evol_input(evol_event *event)
 			event->type = evol_quit_event;
 
 			return 1;
+
+		/* controller */
+
+		case SDL_CONTROLLERDEVICEADDED:
+
+			SDL_GameControllerOpen(e.cdevice.which);
+			return 0;
 
 		default:
 
