@@ -401,13 +401,6 @@ int evol_input(evol_event *event)
 
 			return 1;
 
-		/* controller */
-
-		case SDL_CONTROLLERDEVICEADDED:
-
-			SDL_GameControllerOpen(e.cdevice.which);
-			return 0;
-
 		default:
 
 			return 0;
