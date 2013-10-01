@@ -78,3 +78,11 @@ typedef struct
 
 int evol_input(evol_event *event);
 const char* evol_get_key_name(int key);
+
+/* Text */
+
+typedef void* evol_font;
+
+evol_font evol_load_font(const char *path, int size);
+void evol_free_font(evol_font font);
+evol_image evol_draw_font(evol_font font, const char *text, byte r, byte g, byte b);

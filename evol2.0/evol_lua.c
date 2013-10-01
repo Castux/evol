@@ -337,6 +337,54 @@ static int l_input(lua_State *L)
 	return 1;
 }
 
+static int l_load_font(lua_State *L)
+{
+	const char *path = luaL_checkstring(L, 1);
+	int size = luaL_optinteger(L, 2, 12);
+
+	evol_font font = evol_load_font(path, size);
+
+	lua_pushlightuserdata(L, font);
+
+	return 1;
+}
+
+static evol_font check_font(lua_State *L)
+{
+	evol_font font = (evol_font) lua_touserdata(L, 1);
+
+	if(!font)
+	{
+		luaL_error(L, "invalid font\n");
+	}
+
+	return font;
+}
+
+static int l_free_font(lua_State *L)
+{
+	evol_font font = check_font(L);
+
+	evol_free_font(font);
+
+	return 0;
+}
+
+static int l_draw_font(lua_State *L)
+{
+	evol_font font = check_font(L);
+	const char *text = luaL_checkstring(L, 2);
+	int r = luaL_optinteger(L, 3 , 0);
+	int g = luaL_optinteger(L, 4 , 0);
+	int b = luaL_optinteger(L, 5 , 0);
+
+	evol_image image = evol_draw_font(font, text, r, g, b);
+
+	lua_pushlightuserdata(L, image);
+
+	return 1;
+}
+
 /* Module opening */
 
 static const struct luaL_reg R[] =
@@ -356,6 +404,10 @@ static const struct luaL_reg R[] =
 	{"get_image_size", l_get_image_size},
 	{"set_image_modulation", l_set_image_modulation},
 	{"draw_image", l_draw_image},
+
+	{"load_font", l_load_font},
+	{"free_font", l_free_font},
+	{"draw_font", l_draw_font},
 
 	{"input", l_input},
 	

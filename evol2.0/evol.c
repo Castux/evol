@@ -1,8 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SDL2/SDL.h"
-#include "SDL2_image/SDL_image.h"
+#ifdef __APPLE__
+	#include "SDL2/SDL.h"
+	#include "SDL2_image/SDL_image.h"
+	#include "SDL2_ttf/SDL_ttf.h"
+#else
+	#include "SDL.h"
+	#include "SDL_image.h"
+	#include "SDL_ttf.h"
+#endif
 
 #include "evol.h"
 
@@ -46,6 +53,10 @@ void evol_init()
 			SDL_GameControllerOpen(i);
 		}
 	}
+
+	/* Text */
+
+	TTF_Init();
 }
 
 void evol_quit()
@@ -53,6 +64,7 @@ void evol_quit()
 	SDL_DestroyRenderer(evol_renderer);
 	SDL_DestroyWindow(evol_window);
 
+	TTF_Quit();
 	IMG_Quit();
 	SDL_Quit();
 }
@@ -404,4 +416,33 @@ int evol_input(evol_event *event)
 const char* evol_get_key_name(int key)
 {
 	return SDL_GetKeyName(key);
+}
+
+evol_font evol_load_font(const char *path, int size)
+{
+	TTF_Font *font = TTF_OpenFont(path, size);
+
+	if(font == NULL)
+	{
+		evol_error("could not load font");
+	}
+
+	return (evol_font) font;
+}
+
+void evol_free_font(evol_font font)
+{
+	TTF_CloseFont((TTF_Font *) font);
+}
+
+evol_image evol_draw_font(evol_font font, const char *text, byte r, byte g, byte b)
+{
+	SDL_Color color = {r, g, b, 255};
+
+	SDL_Surface *surface = TTF_RenderUTF8_Blended((TTF_Font *) font, text, color);
+	
+	SDL_Texture *texture = SDL_CreateTextureFromSurface(evol_renderer, surface);
+	SDL_FreeSurface(surface);
+
+	return (evol_image) texture;
 }
