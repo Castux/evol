@@ -1,5 +1,8 @@
-evolcore.dll: evolcore.c
-	i586-mingw32msvc-gcc evolcore.c -shared -o evolcore.dll -Wall -I/usr/i586-mingw32msvc/include -I/usr/i586-mingw32msvc/include/SDL -lSDL_image -lSDL_ttf -lSDL_gfx -lSDL_mixer -lSDL -llua5.1 -Wl,--exclude-symbols,SDL_gfx_NULL_THUNK_DATA,--exclude-symbols,SDL_image_NULL_THUNK_DATA,--exclude-symbols,SDL_mixer_NULL_THUNK_DATA,--exclude-symbols,SDL_ttf_NULL_THUNK_DATA
+main: main.c evol.o lua_evol.o
+	gcc -o main main.c evol.o lua_evol.o lua/src/liblua.a -framework SDL2 -framework SDL2_image -framework SDL2_ttf
 
-evol_dingux: evolcore.c evol_dingux.c
-	mipsel-linux-gcc evolcore.c evol_dingux.c -o evol_dingux -Wall -I/opt/mipsel-linux-uclibc/usr/include -I/opt/mipsel-linux-uclibc/usr/include/SDL -lSDL_image -lSDL_ttf -lSDL_gfx -lSDL_mixer -lSDL -llua
+evol.o: evol.c
+	gcc -o evol.o -c evol.c
+
+lua_evol.o: evol.a evol_lua.c
+	gcc -o lua_evol.o -c evol_lua.c -I ./lua/src
