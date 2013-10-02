@@ -1,8 +1,4 @@
-#include "lua.h"
-#include "lualib.h"
-#include "lauxlib.h"
-
-#include "evol.h"
+#include "evol_lua.h"
 
 /* Function wrapping */
 

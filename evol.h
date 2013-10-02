@@ -1,3 +1,6 @@
+#ifndef evol_h
+#define evol_h
+
 typedef enum
 {
 	evol_windowed,
@@ -86,3 +89,5 @@ typedef void* evol_font;
 evol_font evol_load_font(const char *path, int size);
 void evol_free_font(evol_font font);
 evol_image evol_draw_font(evol_font font, const char *text, byte r, byte g, byte b);
+
+#endif
