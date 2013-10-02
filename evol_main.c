@@ -25,8 +25,7 @@ int main(int argc, char **argv)
 	L = luaL_newstate();
 	luaL_openlibs(L);
 	
-	lua_pushcfunction(L, luaopen_evol);
-	lua_call(L,0,0);
+	luaL_requiref(L, "evol", luaopen_evol, 1);
 
 	if (luaL_dofile(L, path) != 0)
 	{

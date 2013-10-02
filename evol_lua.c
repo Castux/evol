@@ -377,7 +377,7 @@ static int l_draw_font(lua_State *L)
 
 /* Module opening */
 
-static const struct luaL_reg R[] =
+static const struct luaL_Reg R[] =
 {
 	{"init", l_init},
 	{"quit", l_quit},
@@ -404,8 +404,8 @@ static const struct luaL_reg R[] =
 	{NULL, NULL}
 };
 
-int luaopen_evol (lua_State *L)
+int luaopen_evol(lua_State *L)
 {
-	luaL_register(L, "evol", R);
+	luaL_newlib(L, R);
 	return 1;
 }
