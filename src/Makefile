@@ -1,4 +1,4 @@
-LUA_DIR=lua
+LUA_DIR=../lua
 
 PLAT= 
 EVOL_LIBS= 

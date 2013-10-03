@@ -203,6 +203,55 @@ static int l_draw_image(lua_State *L)
 	return 0;
 }
 
+static int l_set_draw_color(lua_State *L)
+{
+	int r = luaL_optint(L, 1, 255);
+	int g = luaL_optint(L, 2, 255);
+	int b = luaL_optint(L, 3, 255);
+	int a = luaL_optint(L, 4, 255);
+
+	evol_set_draw_color(r, g, b, a);
+
+	return 0;
+}
+
+static int l_draw_point(lua_State *L)
+{
+	int x = luaL_checkint(L, 1);
+	int y = luaL_checkint(L, 2);
+
+	evol_draw_point(x, y);
+
+	return 0;
+}
+
+static int l_draw_line(lua_State *L)
+{
+	int x1 = luaL_checkint(L, 1);
+	int y1 = luaL_checkint(L, 2);
+	int x2 = luaL_checkint(L, 3);
+	int y2 = luaL_checkint(L, 4);
+
+	evol_draw_line(x1, y1, x2, y2);
+
+	return 0;
+}
+
+static int l_draw_rect(lua_State *L)
+{
+	int x = luaL_checkint(L, 1);
+	int y = luaL_checkint(L, 2);
+	int w = luaL_checkint(L, 3);
+	int h = luaL_checkint(L, 4);
+
+	int fill = lua_toboolean(L, 5);
+
+
+	evol_draw_rect(x, y, w, h, fill);
+
+	return 0;
+}
+
 static const char *event_devices[] =
 {
 	"mouse",
@@ -390,6 +439,11 @@ static const struct luaL_Reg R[] =
 	{"get_image_size", l_get_image_size},
 	{"set_image_modulation", l_set_image_modulation},
 	{"draw_image", l_draw_image},
+
+	{"set_draw_color", l_set_draw_color},
+	{"draw_point", l_draw_point},
+	{"draw_line", l_draw_line},
+	{"draw_rect", l_draw_rect},
 
 	{"load_font", l_load_font},
 	{"free_font", l_free_font},

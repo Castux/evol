@@ -32,6 +32,11 @@ void evol_set_image_modulation(evol_image image, byte r, byte g, byte b, byte a)
 void evol_draw_image(evol_image image, int x, int y);
 void evol_draw_image2(evol_image image, int x, int y, double scale_x, double scale_y, int pivot_x, int pivot_y, double angle);
 
+void evol_set_draw_color(byte r, byte g, byte b, byte a);
+void evol_draw_point(int x, int y);
+void evol_draw_line(int x1, int y1, int x2, int y2);
+void evol_draw_rect(int x, int y, int w, int h, int fill);
+
 /* Events */
 
 typedef enum

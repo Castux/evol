@@ -1,0 +1,92 @@
+etah
+====
+
+A game framework built on top of evol, in Lua.
+Inspired by Flash, Starling, EaselJS, etc.
+
+- asset manager
+- scene manager ("director")
+- retained mode tree
+- input handler
+- event propagation
+- tweening and other dynamic movements
+
+Asset Manager
+-------------
+
+Straightforward: iterates on an asset folder (if system allows), loads images and sounds and stores them in tables, indexed by filename (without extension).
+
+Access by name, loads if not yet loaded, and returns asset.
+
+Scene manager
+-------------
+
+A scene is not much more than the root of the display tree. The current scene is the current receiver of the input events, updates, and draws. Scenes can be switched or stacked.
+
+The director keeps track of the scenes and runs the core game loop.
+
+To investigate: scene loading from data description.
+
+Retained mode
+-------------
+
+A tree of game objects, used for input, update and graphics.
+
+Each node in the tree can have:
+
+- a name for easy access
+- a transform (position, [scale and rotation available only for text and image leaf nodes])
+- a vector graphics list (point, line, rectangle)
+- text
+- an image
+- a color modulation (including alpha)
+- an update function
+- a custom draw function
+- event handling function(s)
+
+The tree is navigated three times:
+
+- events
+- update
+- draw
+
+Flags control if the node and its children are visited:
+
+- listens
+- active
+- visible
+
+Bounding boxes are updated automatically and provided for every object (that has a transform), computed from the image and graphics leaves.
+
+Input handler
+-------------
+
+Two main situations arise:
+
+1. Input is mostly directed at one kind of game object, with the possibility of using either gamepad or keyboard/mouse. Typically, controlling a player character (or several with several devices). In this case, we'd like the system to automatically translate raw input into high level commands, as well as retaining the state of the input devices, and not bother the other game objects.
+2. Input is directed at many objects, that each handles them independently. Typically, touches/clicks in GUI. In that case, we'd like the system to forward event to all the objects automatically, and just handle things where it needs to be handled.
+
+For 1., we provide an event registering system with filtering ("please send me all input from gamepad #2"), and a virtual button/axes translation.
+
+For 2., we use the normal scene tree, with optional functions on the nodes ("on_event", "on_mouse_event", etc.)
+
+Event propagation
+-----------------
+
+When direct method calls are inconvenient, the tree can propagate custom events up and down to other nodes, in a one to one or broadcast way.
+
+That prevents having to keep references to the other relevant actors of the scene, and allows to refer to them only by name, at the cost of execution time.
+
+Tweening
+--------
+
+In the update phase, etah will look for tweening information in the nodes, and apply them automatically. This will include basic static tweening, and dynamic targets.
+
+Includes easy chaining, easing functions, and callbacks.
+
+Structure
+=========
+
+Informal object orientation. All the features are mostly optional, and work on simple tables. The game loop can be triggered from simple functions. Everything is data driven, and the custom behaviors are user-provided functions attached to these tables, with one self parameter.
+
+It's up to the user to build these tables as objects or not, although the library provides factory functions.

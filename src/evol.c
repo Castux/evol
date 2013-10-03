@@ -117,6 +117,10 @@ void evol_set_mode(evol_window_mode mode, int width, int height)
 	{
 		SDL_SetWindowSize(evol_window, width, height);
 	}
+
+	/* Options */
+
+	SDL_SetRenderDrawBlendMode(evol_renderer, SDL_BLENDMODE_BLEND);
 }
 
 void evol_get_mode(evol_window_mode *mode, int *width, int *height)
@@ -256,6 +260,35 @@ void evol_draw_image2(evol_image image, int x, int y, double scale_x, double sca
 	dst_rect.h *= scale_y;
 
 	SDL_RenderCopyEx(evol_renderer, texture, NULL, &dst_rect, angle, &center, 0);
+}
+
+void evol_set_draw_color(byte r, byte g, byte b, byte a)
+{
+	SDL_SetRenderDrawColor(evol_renderer, r, g, b, a);
+}
+
+void evol_draw_point(int x, int y)
+{
+	SDL_RenderDrawPoint(evol_renderer, x, y);
+}
+
+void evol_draw_line(int x1, int y1, int x2, int y2)
+{
+	SDL_RenderDrawLine(evol_renderer, x1, y1, x2, y2);
+}
+
+void evol_draw_rect(int x, int y, int w, int h, int fill)
+{
+	SDL_Rect rect = {x, y, w, h};
+
+	if(fill)
+	{
+		SDL_RenderFillRect(evol_renderer, &rect);
+	}
+	else
+	{
+		SDL_RenderDrawRect(evol_renderer, &rect);
+	}
 }
 
 int evol_input(evol_event *event)
