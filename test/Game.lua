@@ -1,13 +1,15 @@
-Game = class(Scene)
+Game = etah.class(etah.Scene)
+local super = Game.super
 
 function Game:init()
 
-	Game.super.init(self)
-
-	print(etah)
-	print(etah.class, class)
-	print(etah.Scene, Scene)
-
+	super.init(self)
 
 	print("game!")
+end
+
+function Game:draw()
+
+	evol.clear_screen(100,100,100)
+
 end

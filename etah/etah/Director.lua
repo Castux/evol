@@ -1,4 +1,6 @@
-Director = class()
+local class = require "etah.class"
+
+local Director = class()
 
 function Director:init(first_scene, fps_cap)
 
@@ -71,3 +73,5 @@ function Director:execute_scene_switch()
 	self.scene = self.next_scene_class()
 	self.next_scene_class = nil
 end
+
+return Director

@@ -1,4 +1,19 @@
-class = function(base)
+local isa = function(obj,cla)
+
+	-- Is is even an object?
+	if type(obj) ~= "table" or not obj.class then
+		return false
+	end
+
+	-- Is it a descendant of class?
+	if obj.super then
+		return obj.class == cla or obj.super:isa(cla)
+	else
+		return obj.class == cla
+	end
+end
+
+local class = function(base)
 	local c = {}
 	c.__index = c
 	c.class = c
@@ -33,17 +48,4 @@ class = function(base)
 	return c
 end
 
-isa = function(obj,cla)
-
-	-- Is is even an object?
-	if type(obj) ~= "table" or not obj.class then
-		return false
-	end
-
-	-- Is it a descendant of class?
-	if obj.super then
-		return obj.class == cla or obj.super:isa(cla)
-	else
-		return obj.class == cla
-	end
-end
+return class

@@ -1,12 +1,12 @@
 package.path = package.path .. ";../etah/?.lua"
 
-require "etah"
+etah = require "etah"
 require "Game"
 
 print("etah version:", etah.version)
 
 evol.init()
-evol.set_mode("fullscreen")
+evol.set_mode("windowed", 400, 300)
 
 etah.run(Game)
 

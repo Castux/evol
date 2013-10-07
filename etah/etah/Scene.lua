@@ -1,4 +1,6 @@
-Scene = class()
+local class = require "etah.class"
+
+local Scene = class()
 
 function Scene:init()
 
@@ -15,3 +17,5 @@ end
 function Scene:draw()
 
 end
+
+return Scene
