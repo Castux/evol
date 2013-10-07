@@ -1,4 +1,4 @@
-package.path = package.path .. ";../etah/?.lua"
+package.path = package.path .. ";../?.lua;../?/init.lua"
 
 etah = require "etah"
 require "Game"
