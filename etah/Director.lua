@@ -25,6 +25,14 @@ function Director:switch_scene(scene)
 	self.next_scene_class = scene
 end
 
+function Director:execute_scene_switch()
+
+	-- cleanup old scene?
+
+	self.scene = self.next_scene_class()
+	self.next_scene_class = nil
+end
+
 function Director:run()
 
 	self:execute_scene_switch()
@@ -40,13 +48,16 @@ function Director:run()
 		-- input
 
 		while evol.input(event) do
-
+			
 			if event.type == "quit" then
 				self.quit = true
 			else
 				self.scene:handle_input(event)
 			end
 
+			for k,v in pairs(event) do
+				event[k] = nil
+			end
 		end
 
 		-- update
@@ -55,6 +66,7 @@ function Director:run()
 
 		-- drawing
 
+		evol.clear_screen(self.scene.color.r, self.scene.color.g, self.scene.color.b)
 		self.scene:draw()
 		evol.update_screen()
 
@@ -66,12 +78,6 @@ function Director:run()
 	end
 end
 
-function Director:execute_scene_switch()
 
-	-- cleanup old scene?
-
-	self.scene = self.next_scene_class()
-	self.next_scene_class = nil
-end
 
 return Director

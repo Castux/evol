@@ -3,11 +3,18 @@ package.path = package.path .. ";../?.lua;../?/init.lua"
 etah = require "etah"
 require "Game"
 
-print("etah version:", etah.version)
+function main()
+	print("etah version:", etah.version)
 
-evol.init()
-evol.set_mode("windowed", 400, 300)
+	evol.init()
+	evol.set_mode("windowed", 400, 300)
 
-etah.run(Game)
+	etah.run(Game)
 
-evol.quit()
+	evol.quit()
+end
+
+local success, message = pcall(main)
+if not success then
+	print(debug.traceback(message))
+end

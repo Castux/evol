@@ -5,11 +5,16 @@ function Game:init()
 
 	super.init(self)
 
+	self.color:set(100,100,0)
+
 	print("game!")
 end
 
-function Game:draw()
+function Game:handle_input(event)
 
-	evol.clear_screen(100,100,100)
+	for k,v in pairs(event) do
+		io.write(k,':',v,', ')
+	end
+	io.write('\n')
 
 end

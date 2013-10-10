@@ -302,21 +302,35 @@ int evol_input(evol_event *event)
 
 		case SDL_KEYDOWN:
 			
-			event->type = evol_button_event;
-			event->device = evol_keyboard;
-			event->elem_num = e.key.keysym.sym;
-			event->state = evol_down;
+			if(!e.key.repeat)
+			{
+				event->type = evol_button_event;
+				event->device = evol_keyboard;
+				event->elem_num = e.key.keysym.sym;
+				event->state = evol_down;
 
-			return 1;
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
 
 		case SDL_KEYUP:
 			
-			event->type = evol_button_event;
-			event->device = evol_keyboard;
-			event->elem_num = e.key.keysym.sym;
-			event->state = evol_up;
-			
-			return 1;
+			if(!e.key.repeat)
+			{
+				event->type = evol_button_event;
+				event->device = evol_keyboard;
+				event->elem_num = e.key.keysym.sym;
+				event->state = evol_up;
+				
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
 
 		/* mouse */
 

@@ -1,8 +1,11 @@
 local class = require "etah.class"
+local Color = require "etah.Color"
 
 local Scene = class()
 
 function Scene:init()
+
+	self.color = Color()
 
 end
 

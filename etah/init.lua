@@ -9,7 +9,8 @@ version = "0.1"
 local submodules = {
 	"class",
 	"Director",
-	"Scene"
+	"Scene",
+	"Color"
 }
 
 for i,v in ipairs(submodules) do
