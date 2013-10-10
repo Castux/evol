@@ -66,7 +66,8 @@ function Director:run()
 
 		-- drawing
 
-		evol.clear_screen(self.scene.color.r, self.scene.color.g, self.scene.color.b)
+		local bg = self.scene.background
+		evol.clear_screen(bg.r, bg.g, bg.b)
 		self.scene:internal_draw()
 		evol.update_screen()
 

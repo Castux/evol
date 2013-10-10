@@ -8,7 +8,7 @@ function Scene:init()
 
 	Scene.super.init(self)
 
-	self.color = Color()
+	self.background = Color()
 end
 
 return Scene

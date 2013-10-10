@@ -29,4 +29,8 @@ function new_scene()
 	return etah.class(etah.Scene)
 end
 
+function new_entity()
+	return etah.class(etah.Entity)
+end
+
 return etah
