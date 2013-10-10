@@ -9,7 +9,7 @@ function Game:init()
 	print("game!")
 end
 
-function Game:handle_input(event)
+function Game:input(event)
 
 	for k,v in pairs(event) do
 		io.write(k,':',v,', ')

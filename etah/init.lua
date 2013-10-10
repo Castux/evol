@@ -9,6 +9,7 @@ version = "0.1"
 local submodules = {
 	"class",
 	"Director",
+	"Entity",
 	"Scene",
 	"Color"
 }

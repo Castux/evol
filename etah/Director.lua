@@ -52,7 +52,7 @@ function Director:run()
 			if event.type == "quit" then
 				self.quit = true
 			else
-				self.scene:handle_input(event)
+				self.scene:internal_input(event)
 			end
 
 			for k,v in pairs(event) do
@@ -62,12 +62,12 @@ function Director:run()
 
 		-- update
 
-		self.scene:update()
+		self.scene:internal_update()
 
 		-- drawing
 
 		evol.clear_screen(self.scene.color.r, self.scene.color.g, self.scene.color.b)
-		self.scene:draw()
+		self.scene:internal_draw()
 		evol.update_screen()
 
 		-- switching
