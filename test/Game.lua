@@ -1,9 +1,8 @@
-Game = etah.class(etah.Scene)
-local super = Game.super
+Game = etah.new_scene()
 
 function Game:init()
 
-	super.init(self)
+	Game.super.init(self)
 
 	self.color:set(100,100,0)
 

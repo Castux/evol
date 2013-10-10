@@ -24,4 +24,8 @@ function run(first_scene)
 	
 end
 
+function new_scene()
+	return etah.class(etah.Scene)
+end
+
 return etah

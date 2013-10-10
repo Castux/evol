@@ -48,7 +48,7 @@ function Director:run()
 		-- input
 
 		while evol.input(event) do
-			
+
 			if event.type == "quit" then
 				self.quit = true
 			else
@@ -77,7 +77,5 @@ function Director:run()
 		end
 	end
 end
-
-
 
 return Director
